@@ -1,0 +1,6 @@
+day*.ml
+day*.mli
+*.cmo
+*.cmi
+*.cmx
+*.native
