@@ -9,9 +9,19 @@ Dependencies
     This project serves to test coq-simple-io and see what is missing to
     make it practical to write executable programs in Coq.
 
-- Coq 8.8.2
+- [Coq](https://coq.inria.fr/) 8.8.2
 
-- OCaml
+- [OCaml](https://ocaml.org)
+
+Install the development version of coq-simple-io with opam
+----------------------------------------------------------
+
+```sh
+opam pin add coq-simple-io --dev-repo
+
+# When coq-simple-io is updated
+opam reinstall coq-simple-io
+```
 
 Build
 -----
