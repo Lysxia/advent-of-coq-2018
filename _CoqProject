@@ -1,5 +1,6 @@
 -Q . advent
 lib/string.v
+lib/stream.v
 lib/io.v
 lib/mock.v
 lib/mock_spec.v

@@ -1,2 +1,2 @@
 From advent Require Export
-     io mock rel string utils.
+     io mock rel string stream utils.
