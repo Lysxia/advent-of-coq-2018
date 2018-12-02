@@ -52,9 +52,9 @@ Proof.
   exists (Mk_io_state [] [sum_Z zs]); split; [| auto].
   unfold rel_spec, main; simpl.
   match goal with
-  | [ |- lfp_rel ?body _ _ _ _ ] =>
+  | [ |- lfp_rel1 ?body _ _ _ _ ] =>
     assert (H : forall z0 zs,
-               lfp_rel body z0 (initial zs)
+               lfp_rel1 body z0 (initial zs)
                        (Mk_io_state [] [(z0 + sum_Z zs)%Z]) tt)
   end.
   { clear zs.
