@@ -5,26 +5,42 @@ Import ListNotations.
 From Coq.extraction Require Import
      ExtrOcamlIntConv.
 
-From SimpleIO Require Import
-     IOMonad CoqPervasives Utils.
+From SimpleIO Require
+     IOMonad.
 
-Import IONotations.
+From ExtLib Require Import
+     Structures.Monads.
+Import MonadNotation.
+Local Open Scope monad.
 
-Definition read_Z : IO Z :=
-  map_io z_of_int read_int.
+From advent Require Import lib.
 
-Definition print_Z (z : Z) : IO unit :=
-  print_int (int_of_z z);;
-  print_newline.
+Section main.
 
-Definition main : IO unit :=
-  fix_io (fun loop z0 =>
-    oz <- catch_eof read_Z;;
+Context {m : Type -> Type} `{Monad m}
+        `{MonadIOZ m} `{MonadFix m}.
+
+Definition main : m unit :=
+  mfix (fun loop z0 =>
+    oz <- read_Z;;
     match oz with
     | None => print_Z z0
     | Some z => loop (z + z0)%Z
     end) 0%Z.
 
+End main.
+
+Import SimpleIO.IOMonad.
+
 Definition exec : io_unit := unsafe_run main.
 
 Extraction "day01_1.ml" exec.
+
+(**)
+
+(* Functional spec. *)
+Fixpoint sum_Z (zs : list Z) : Z :=
+  match zs with
+  | [] => 0
+  | z :: zs => z + sum_Z zs
+  end.
