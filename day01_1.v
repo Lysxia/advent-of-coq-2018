@@ -46,10 +46,9 @@ Fixpoint sum_Z (zs : list Z) : Z :=
 (* If you run [main] with the input [zs], then
    the printed output will be exactly [sum_Z zs]. *)
 Theorem main_correct zs :
-  exists s_final,
-    rel_spec main (initial zs) s_final /\
-    output s_final = [sum_Z zs].
+  rel_spec Z Z main zs [sum_Z zs].
 Proof.
+  unfold rel_spec.
   exists (Mk_io_state [] [sum_Z zs]); split; [| auto].
   unfold rel_spec, main; simpl.
   match goal with
