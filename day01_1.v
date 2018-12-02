@@ -1,9 +1,7 @@
 From Coq Require Import
-     List ZArith Ascii String.
+     List ZArith Ascii String
+     extraction.ExtrOcamlIntConv.
 Import ListNotations.
-
-From Coq.extraction Require Import
-     ExtrOcamlIntConv.
 
 From SimpleIO Require
      IOMonad.
