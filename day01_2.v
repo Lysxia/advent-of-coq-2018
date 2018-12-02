@@ -40,7 +40,7 @@ Definition parse_stream : m (Stream Z) :=
     oz <- read;;
     match oz with
     | None =>
-      match cycle (rev acc) with
+      match cycle (rev' acc) with
       | None => error "empty input"
       | Some s => ret s
       end
