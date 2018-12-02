@@ -33,11 +33,11 @@ Section main.
 
 Context {m : Type -> Type}
         `{Monad m} `{MonadError m}
-        `{MonadIOZ m} `{MonadFix m}.
+        `{MonadI Z m} `{MonadO Z m} `{MonadFix m}.
 
 Definition parse_stream : m (Stream Z) :=
   mfix (fun loop acc =>
-    oz <- read_Z;;
+    oz <- read;;
     match oz with
     | None =>
       match cycle (rev acc) with
@@ -60,7 +60,7 @@ Definition search (s : Stream Z) : m Z :=
 Definition main : m unit :=
   s <- parse_stream;;
   z <- search s;;
-  print_Z z.
+  print z.
 
 End main.
 

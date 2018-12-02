@@ -52,14 +52,17 @@ Instance MonadError_state_rel s : MonadError (state_rel s) := {
   error _ _ := fun _ _ _ => False
 }.
 
-Instance MonadIOZ_io_rel : MonadIOZ io_rel := {
-  read_Z := fun s1 s2 x' =>
+Instance MonadIZ_io_rel : MonadI Z io_rel := {
+  read := fun s1 s2 x' =>
     (exists z,
       input s1 = z :: input s2 /\
       s2 = drop_input s1 /\
       x' = Some z) \/
     (s2 = s1 /\ x' = None);
-  print_Z z := fun s1 s2 x' =>
+}.
+
+Instance MonadOZ_io_rel : MonadO Z io_rel := {
+  print z := fun s1 s2 x' =>
     s2 = push_output z s1 /\
     x' = tt
 }.

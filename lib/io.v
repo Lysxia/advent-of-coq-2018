@@ -21,9 +21,14 @@ Class MonadError (m : Type -> Type) : Type := {
 
 Arguments error {m _ a}.
 
-Class MonadIOZ (m : Type -> Type) : Type := {
-  read_Z : m (option Z);
-  print_Z : Z -> m unit;
+(* Read inputs of type [I]. *)
+Class MonadI (I : Type) (m : Type -> Type) : Type := {
+  read : m (option I);
+}.
+
+(* Print outputs of type [O]. *)
+Class MonadO (O : Type) (m : Type -> Type) : Type := {
+  print : O -> m unit;
 }.
 
 (* Implementation *)
@@ -57,7 +62,10 @@ Instance MonadError_IO : MonadError IO := {
   error := IO.error;
 }.
 
-Instance MonadIOZ_IO : MonadIOZ IO := {
-  read_Z := IO.read_Z;
-  print_Z := IO.print_Z;
+Instance MonadIZ_IO : MonadI Z IO := {
+  read := IO.read_Z;
+}.
+
+Instance MonadOZ_IO : MonadO Z IO := {
+  print := IO.print_Z;
 }.

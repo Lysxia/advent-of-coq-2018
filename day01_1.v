@@ -18,13 +18,13 @@ From advent Require Import lib.
 Section main.
 
 Context {m : Type -> Type} `{Monad m}
-        `{MonadIOZ m} `{MonadFix m}.
+        `{MonadI Z m} `{MonadO Z m} `{MonadFix m}.
 
 Definition main : m unit :=
   mfix (fun loop z0 =>
-    oz <- read_Z;;
+    oz <- read;;
     match oz with
-    | None => print_Z z0
+    | None => print z0
     | Some z => loop (z + z0)%Z
     end) 0%Z.
 

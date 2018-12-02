@@ -36,13 +36,16 @@ Global Instance Monad_mock r : Monad (mock r) := {
     q a (o ++ o'))));
 }.
 
-Global Instance MonadIOZ_mock r : MonadIOZ (mock r) := {
-  read_Z := Mk_mock (fun k zs =>
+Global Instance MonadIZ_mock r : MonadI Z (mock r) := {
+  read := Mk_mock (fun k zs =>
     match zs with
     | [] => k None [] []
     | z :: zs => k (Some z) [] zs
     end);
-  print_Z z := Mk_mock (fun k zs => k tt [] [z]);
+}.
+
+Global Instance MonadOZ_mock r : MonadO Z (mock r) := {
+  print z := Mk_mock (fun k zs => k tt [] [z]);
 }.
 
 (* Fuel for [mfix] *)
@@ -73,8 +76,12 @@ Instance MonadFix_fuelT (m : Type -> Type)
       end) fuel0 a
 }.
 
-Instance MonadIOZ_fuelT (m : Type -> Type)
-         `{Monad m} `{MonadIOZ m} : MonadIOZ (fuelT m) := {
-  read_Z := fun _ => liftM Some read_Z;
-  print_Z z := fun _ => liftM Some (print_Z z);
+Instance MonadIZ_fuelT I (m : Type -> Type)
+         `{Monad m} `{MonadI I m} : MonadI I (fuelT m) := {
+  read := fun _ => liftM Some read;
+}.
+
+Instance MonadOZ_fuelT O (m : Type -> Type)
+         `{Monad m} `{MonadO O m} : MonadO O (fuelT m) := {
+  print z := fun _ => liftM Some (print z);
 }.
