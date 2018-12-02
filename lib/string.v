@@ -1,5 +1,22 @@
 From Coq Require Import
-     Ascii OrderedType.
+     Ascii String List OrderedType.
+Import ListNotations.
+
+(* Convert between strings and lists. *)
+
+Fixpoint list_of_string (s : string) : list ascii :=
+  match s with
+  | ""%string => []
+  | String c s => c :: list_of_string s
+  end.
+
+Fixpoint string_of_list (cs : list ascii) : string :=
+  match cs with
+  | [] => ""%string
+  | c :: cs => String c (string_of_list cs)
+  end.
+
+(* [ascii] as an [OrderedType]. *)
 
 Class Ordered (T : Type) : Type := {
   lt : T -> T -> Prop;

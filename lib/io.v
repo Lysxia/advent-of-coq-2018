@@ -1,7 +1,7 @@
 (* Interface for IO. *)
 
 From Coq Require Import
-     List ZArith String
+     List ZArith Ascii String
      extraction.ExtrOcamlIntConv.
 Import ListNotations.
 
@@ -14,6 +14,9 @@ From ExtLib Require Import
 
 From SimpleIO Require Import
      IOMonad CoqPervasives Utils.
+
+From advent.lib Require Import
+     string.
 
 Class MonadError (m : Type -> Type) : Type := {
   error : forall a, string -> m a;
@@ -49,12 +52,20 @@ Import IONotations.
 Definition error (a : Type) (s : string) : IO a :=
   prerr_endline s;; exit_nat 1.
 
-Definition read_Z : IO (option Z) :=
-  catch_eof (map_io z_of_int read_int).
+Definition read_of_int {A : Type} (of_int : int -> A)
+  : IO (option A) :=
+  catch_eof (map_io of_int read_int).
 
-Definition print_Z (z : Z) : IO unit :=
-  print_int (int_of_z z);;
+Definition print_to_int {A : Type} (to_int : A -> int)
+           (n : A) : IO unit :=
+  print_int (to_int n);;
   print_newline.
+
+Definition read_Z : IO (option Z) := read_of_int z_of_int.
+Definition read_nat : IO (option nat) := read_of_int nat_of_int.
+
+Definition print_Z : Z -> IO unit := print_to_int int_of_z.
+Definition print_nat : nat -> IO unit := print_to_int int_of_nat.
 
 End IO.
 
@@ -62,10 +73,22 @@ Instance MonadError_IO : MonadError IO := {
   error := IO.error;
 }.
 
-Instance MonadIZ_IO : MonadI Z IO := {
+Instance MonadI_string_IO : MonadI string IO := {
+  read := catch_eof read_line;
+}.
+
+Instance MonadI_list_ascii_IO : MonadI (list ascii) IO := {
+  read := map_io (option_map list_of_string) read
+}.
+
+Instance MonadI_Z_IO : MonadI Z IO := {
   read := IO.read_Z;
 }.
 
-Instance MonadOZ_IO : MonadO Z IO := {
+Instance MonadO_nat_IO : MonadO nat IO := {
+  print := IO.print_nat;
+}.
+
+Instance MonadO_Z_IO : MonadO Z IO := {
   print := IO.print_Z;
 }.
