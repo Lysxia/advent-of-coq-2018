@@ -9,9 +9,13 @@ Dependencies
     This project serves to test coq-simple-io and see what is missing to
     make it practical to write executable programs in Coq.
 
-- [Coq](https://coq.inria.fr/) 8.8.2
+- [coq-ext-lib](https://github.com/coq-ext-lib/coq-ext-lib), 0.10
 
-- [OCaml](https://ocaml.org)
+- [Coq](https://coq.inria.fr/), 8.8.2
+
+- [OCaml](https://ocaml.org), 4.07.0
+
+Older versions of these are likely to work.
 
 Install the development version of coq-simple-io with opam
 ----------------------------------------------------------
