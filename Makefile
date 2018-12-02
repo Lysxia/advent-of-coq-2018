@@ -7,6 +7,9 @@ test-all: all
 	./day01_1.native < day01.example
 	./day01_2.native < day01.example
 	./day02_1.native < day02.example
+	./day02_1.native < day02.example.bis
+	./day02_2.native < day02.example
+	./day02_2.native < day02.example.bis
 
 lib: Makefile.coq
 	$(MAKE) -f Makefile.coq
