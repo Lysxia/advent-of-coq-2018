@@ -99,19 +99,19 @@ Proof.
   - apply GT; firstorder.
 Defined.
 
+Definition tuple_of_ascii :=
+  fun '(Ascii a b c d e f g h) => (a, b, c, d, e, f, g, h).
+
+Lemma tuple_of_ascii_inj : forall t1 t2,
+    tuple_of_ascii t1 = tuple_of_ascii t2 ->
+    t1 = t2.
+Proof.
+  intros [] [] H; inversion H; auto.
+Qed.
+
 Module Ascii_OT <: OrderedType.OrderedType.
    Definition t : Type := ascii.
    Definition eq : t -> t -> Prop := eq.
-
-   Definition tuple_of_ascii :=
-     fun '(Ascii a b c d e f g h) => (a, b, c, d, e, f, g, h).
-
-   Lemma tuple_of_ascii_inj : forall t1 t2,
-       tuple_of_ascii t1 = tuple_of_ascii t2 ->
-       t1 = t2.
-   Proof.
-     intros [] [] H; inversion H; auto.
-   Qed.
 
    Definition lt : t -> t -> Prop :=
      fun t1 t2 => lt (tuple_of_ascii t1) (tuple_of_ascii t2).
@@ -152,3 +152,22 @@ Module Ascii_OT <: OrderedType.OrderedType.
      - right. intro H; symmetry in H; apply lt_not_eq in H; auto.
    Defined.
 End Ascii_OT.
+
+Definition eqb_ascii (a b : ascii) : bool :=
+  if Ascii_OT.eq_dec a b then true else false.
+
+Lemma eqb_eq (a b : ascii) : eqb_ascii a b = true -> a = b.
+Proof.
+  unfold eqb_ascii.
+  destruct Ascii_OT.eq_dec.
+  - auto.
+  - discriminate.
+Qed.
+
+Lemma eq_eqb (a b : ascii) : a = b -> eqb_ascii a b = true.
+Proof.
+  unfold eqb_ascii.
+  destruct Ascii_OT.eq_dec.
+  - auto.
+  - contradiction.
+Qed.
