@@ -4,4 +4,5 @@ lib/io.v
 lib/mock.v
 lib/mock_spec.v
 lib/rel.v
+lib/utils.v
 lib.v

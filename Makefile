@@ -1,6 +1,7 @@
 .PHONY: all lib
 
-all: day01_1.native day01_2.native day02_1.native
+all: day01_1.native day01_2.native \
+	day02_1.native day02_2.native
 
 test-all: all
 	./day01_1.native < day01.example

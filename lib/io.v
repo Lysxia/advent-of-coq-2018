@@ -34,7 +34,28 @@ Class MonadO (O : Type) (m : Type -> Type) : Type := {
   print : O -> m unit;
 }.
 
+(* Extra combinators *)
+
+Section Combini.
+Import MonadNotation.
+Open Scope monad.
+
+Definition read_all {I : Type} {m : Type -> Type}
+           `{Monad m} `{MonadI I m} `{MonadFix m} : m (list I) :=
+  mfix (fun loop xs =>
+    ox <- read;;
+    match ox with
+    | None => Monad.ret (rev' xs)
+    | Some x => loop (x :: xs)
+    end) [].
+
+End Combini.
+
 (* Implementation *)
+
+Module IO.
+
+Import IONotations.
 
 Instance Monad_IO : Monad IO := {
   Monad.ret := @IOMonad.ret;
@@ -44,10 +65,6 @@ Instance Monad_IO : Monad IO := {
 Instance MonadFix_IO : MonadFix IO := {
   mfix := @fix_io;
 }.
-
-Module IO.
-
-Import IONotations.
 
 Definition error (a : Type) (s : string) : IO a :=
   prerr_endline s;; exit_nat 1.
@@ -66,8 +83,6 @@ Definition read_nat : IO (option nat) := read_of_int nat_of_int.
 
 Definition print_Z : Z -> IO unit := print_to_int int_of_z.
 Definition print_nat : nat -> IO unit := print_to_int int_of_nat.
-
-End IO.
 
 Instance MonadError_IO : MonadError IO := {
   error := IO.error;
@@ -92,3 +107,13 @@ Instance MonadO_nat_IO : MonadO nat IO := {
 Instance MonadO_Z_IO : MonadO Z IO := {
   print := IO.print_Z;
 }.
+
+Instance MonadO_string_IO : MonadO string IO := {
+  print := print_endline;
+}.
+
+Instance MonadO_list_ascii_IO : MonadO (list ascii) IO := {
+  print := fun s => print_endline (string_of_list s);
+}.
+
+End IO.
