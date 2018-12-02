@@ -44,3 +44,38 @@ Fixpoint sum_Z (zs : list Z) : Z :=
   | [] => 0
   | z :: zs => z + sum_Z zs
   end.
+
+(* If you run [main] with the input [zs], then
+   the printed output will be exactly [sum_Z zs]. *)
+Theorem main_correct zs :
+  exists s_final,
+    rel_spec main (initial zs) s_final /\
+    output s_final = [sum_Z zs].
+Proof.
+  exists (Mk_io_state [] [sum_Z zs]); split; [| auto].
+  unfold rel_spec, main; simpl.
+  match goal with
+  | [ |- lfp_rel ?body _ _ _ _ ] =>
+    assert (H : forall z0 zs,
+               lfp_rel body z0 (initial zs)
+                       (Mk_io_state [] [(z0 + sum_Z zs)%Z]) tt)
+  end.
+  { clear zs.
+    intros z0 zs.
+    revert z0; induction zs as [|z zs IH]; intros z0; apply lfp_rel_fold.
+    - exists None, (initial []).
+      repeat (split; auto).
+      simpl. repeat f_equal.
+      apply Z.add_0_r.
+    - exists (Some z), (initial zs).
+      repeat (split; auto).
+      + left. exists z; auto.
+      + simpl.
+        replace (z0 + (z + sum_Z zs))%Z with ((z + z0) + sum_Z zs)%Z.
+        apply IH.
+        rewrite Z.add_assoc.
+        rewrite (Z.add_comm z).
+        reflexivity.
+  }
+  apply H.
+Qed.
