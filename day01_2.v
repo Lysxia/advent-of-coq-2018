@@ -36,16 +36,11 @@ Context {m : Type -> Type}
         `{MonadI Z m} `{MonadO Z m} `{MonadFix m}.
 
 Definition parse_stream : m (Stream Z) :=
-  mfix (fun loop acc =>
-    oz <- read;;
-    match oz with
-    | None =>
-      match cycle (rev' acc) with
-      | None => error "empty input"
-      | Some s => ret s
-      end
-    | Some z => loop (z :: acc)
-    end) [].
+  zs <- read_all;;
+  match cycle zs with
+  | None => error "empty input"
+  | Some s => ret s
+  end.
 
 Definition no_seen : ZSet.t := ZSet.empty.
 
