@@ -40,8 +40,8 @@ like the Advent of Code.
 
 As with any verification project, there is no way to get 100%
 confidence: there will always be some unchecked component to be
-trusted, and experience shows it is subject to [the 80/20
-principle](https://en.wikipedia.org/wiki/Pareto_principle).
+trusted, and experience shows that, the more you verify, the harder
+it gets to verify the rest.
 Thus we have to pick our battles. For this project, the battle
 stops at parsing. The Advent of Code solutions use and trust a
 simple API with structured inputs/outputs, e.g., with `Z`:
