@@ -2,6 +2,9 @@ From Coq Require Import
      List.
 Import ListNotations.
 
+From ExtLib Require Import
+     Structures.Monad.
+
 Fixpoint find_some {A B : Type}
          (f : A -> option B) (xs : list A) : option B :=
   match xs with
@@ -51,3 +54,11 @@ Proof.
     rewrite (IH ys) by apply Hxs.
     reflexivity.
 Qed.
+
+(* TODO: send to ext-lib *)
+Fixpoint for' {m : Type -> Type} `{Monad m} {A : Type}
+         (xs : list A) (f : A -> m unit) : m unit :=
+  match xs with
+  | [] => ret tt
+  | x :: xs => bind (f x) (fun _ => for' xs f)
+  end.
