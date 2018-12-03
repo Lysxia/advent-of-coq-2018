@@ -1,4 +1,10 @@
-(* Define IO as a relation between input and output states. *)
+(* Here we model IO as a partial function between input and output
+   states: [IO a ~ (io_state -> io_state * a)], actually
+   implemented as [io_state -> io_state -> a -> Prop].
+
+   Partiality is caused by the presence of a general (monadic)
+   fixpoint combinator ([mfix]).
+ *)
 
 From Coq Require Import
      List ZArith String
@@ -15,36 +21,50 @@ From ExtLib Require Import
 From advent.lib Require Import
      io.
 
-(* State [s -> (s * a)] as a relation. *)
+(* First, some general definitions about state [S -> (S * A)].
+   We then specialize [S] to a simple model of IO state. *)
+
+(* [state_rel]: state [S -> (S * A)] as a relation. *)
 Definition state_rel (S : Type) (A : Type) : Type :=
   S -> S -> A -> Prop.
 
+(* [state_rel] is a monad. *)
 Instance Monad_state_rel (S : Type) : Monad (state_rel S) := {
   ret _ x := fun s1 s2 x' => s2 = s1 /\ x' = x;
   bind _ _ m k := fun s1 s3 y =>
     exists x s2, m s1 s2 x /\ k x s2 s3 y
 }.
 
+(* Errors are modelled by the empty relation. *)
 Instance MonadError_state_rel (S : Type) : MonadError (state_rel S) := {
   error _ _ := fun _ _ _ => False
 }.
 
+(* Relations are preordered by implication. *)
 Definition incl_rel {S A : Type} (r1 r2 : state_rel S A) :=
   forall s1 s2 a, r1 s1 s2 a -> r2 s1 s2 a.
 
+(* Logical equivalence. *)
 Definition eq_rel {S A : Type} (r1 r2 : state_rel S A) :=
   incl_rel r1 r2 /\ incl_rel r2 r1.
 
+(* For [mfix], we will be manipulating relations with an extra
+   parameter: [A -> S -> S -> B -> Prop]. *)
 Definition incl_rel1 {S A B : Type}
            (r1 r2 : A -> state_rel S B) :=
   forall x, incl_rel (r1 x) (r2 x).
 
+(* Reflexivity of [incl_rel1]. *)
 Lemma incl_rel1_refl {S A B : Type} (r : A -> state_rel S B) :
   incl_rel1 r r.
 Proof.
   intros x z1 z2 y; auto.
 Qed.
 
+(* Least fixed point of the "relation transformer", [gf] (or
+   "generating function"; note how it maps relations to relations).
+   [gf] is assumed to be monotonic (see below).
+   Definition inspired by [paco] (https://github.com/snu-sf/paco). *)
 Inductive lfp_rel1 {S A B : Type}
           (gf : (A -> state_rel S B) -> (A -> state_rel S B))
           (a : A) (s1 s2 : S) (b : B) : Prop :=
@@ -53,18 +73,15 @@ Inductive lfp_rel1 {S A B : Type}
     (P_ind : incl_rel1 P (lfp_rel1 gf))
     (P_holds : gf P a s1 s2 b).
 
-Definition monotonic_rel {S U V A : Type}
-           (gf : (U -> state_rel S V) -> state_rel S A) :=
-  forall r1 r2,
-    incl_rel1 r1 r2 ->
-    incl_rel (gf r1) (gf r2).
-
+(* [monotonic_rel1 gf : Prop] : the relation transformer [gf]
+   is monotonic. *)
 Definition monotonic_rel1 {S U V A B : Type}
            (gf : (U -> state_rel S V) -> (A -> state_rel S B)) :=
   forall r1 r2,
     incl_rel1 r1 r2 ->
     incl_rel1 (gf r1) (gf r2).
 
+(* [lfp_rel1 gf] is included in [gf (lfp_rel1 gf)]... *)
 Lemma lfp_rel_unfold {S A B : Type}
       (gf : (A -> state_rel S B) -> (A -> state_rel S B))
       (mon_gf : monotonic_rel1 gf) :
@@ -76,6 +93,8 @@ Proof.
   apply P_holds.
 Qed.
 
+(* ... and conversely. Therefore, [lfp_rel1] does define a fixed
+   point... *)
 Lemma lfp_rel_fold {S A B : Type}
       (gf : (A -> state_rel S B) -> (A -> state_rel S B)) :
   incl_rel1 (gf (lfp_rel1 gf)) (lfp_rel1 gf).
@@ -86,6 +105,8 @@ Proof.
   auto.
 Qed.
 
+(* ... and it is in fact the smallest: every other fixed point [fp]
+   contains [lfp_rel1 gf]. *)
 Lemma really_lfp {S A B : Type}
       (gf : (A -> state_rel S B) -> (A -> state_rel S B))
       (mon_gf : monotonic_rel1 gf)
@@ -99,6 +120,7 @@ Proof.
   apply mon_gf with (r1 := P); auto.
 Qed.
 
+(* Fixed-point semantics for [mfix]. *)
 Instance MonadFix_state_rel (S : Type) : MonadFix (state_rel S) := {
   mfix _ _ := lfp_rel1
 }.
@@ -141,6 +163,14 @@ Proof.
   eapply mon_k; eauto.
 Qed.
 
+(* Modelling [IO]. *)
+
+(* We represent IO state as a sequence of inputs and a sequence
+   of outputs. For problems like AoC that should be quite enough.
+   The input and output types are parameters: we trust the
+   parsing/printing done by [read]/[print], there is still quite
+   some space left to play with verification.
+ *)
 Record io_state (I O : Type) := Mk_io_state {
   input : list I;
   output : list O;
@@ -150,21 +180,27 @@ Arguments Mk_io_state {I O} _ _.
 Arguments input {I O} _.
 Arguments output {I O} _.
 
+(* Construct an initial state from an initial input sequence. *)
 Definition initial {I O : Type} (i : list I) : io_state I O :=
   Mk_io_state i [].
 
+(* Update the state on a [read]. *)
 Definition drop_input {I O : Type} (r : io_state I O) : io_state I O :=
   let '(Mk_io_state i o) := r in
   Mk_io_state (tl i) o.
 
+(* Update the state on a [print]. *)
 Definition push_output {I O : Type}
            (z : O) (r : io_state I O) : io_state I O :=
   let '(Mk_io_state i o) := r in
   Mk_io_state i (o ++ [z]).
 
+(* [state_rel] specialized with [io_state]. *)
 Definition io_rel (I O : Type) : Type -> Type :=
   state_rel (io_state I O).
 
+(* Toplevel specification, we model an [IO unit] program
+   as a relation between inputs and outputs. *)
 Definition rel_spec (I O : Type) :
   io_rel I O unit -> list I -> list O -> Prop :=
   fun x i o =>
@@ -172,6 +208,7 @@ Definition rel_spec (I O : Type) :
       x (initial i) s tt /\
       output s = o.
 
+(* Model [read] in [io_rel]. *)
 Instance MonadI_io_rel (I O : Type) : MonadI I (io_rel I O) := {
   read := fun s1 s2 x' =>
     (exists z,
@@ -181,12 +218,15 @@ Instance MonadI_io_rel (I O : Type) : MonadI I (io_rel I O) := {
     (input s1 = [] /\ s2 = s1 /\ x' = None);
 }.
 
+(* Model [print] in [io_rel]. *)
 Instance MonadO_io_rel (I O : Type) : MonadO O (io_rel I O) := {
   print z := fun s1 s2 x' =>
     s2 = push_output z s1 /\
     x' = tt
 }.
 
+(* Specification of [read_all]: it consumes all the input and
+   returns it in a list. *)
 Lemma read_all_rel {I O : Type} :
   eq_rel read_all
          (fun (s1 s2 : io_state I O) xs =>
