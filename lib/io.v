@@ -78,12 +78,6 @@ Definition print_to_int {A : Type} (to_int : A -> int)
   print_int (to_int n);;
   print_newline.
 
-Definition read_Z : IO (option Z) := read_of_int z_of_int.
-Definition read_nat : IO (option nat) := read_of_int nat_of_int.
-
-Definition print_Z : Z -> IO unit := print_to_int int_of_z.
-Definition print_nat : nat -> IO unit := print_to_int int_of_nat.
-
 Instance MonadError_IO : MonadError IO := {
   error := IO.error;
 }.
@@ -96,16 +90,28 @@ Instance MonadI_list_ascii_IO : MonadI (list ascii) IO := {
   read := map_io (option_map list_of_string) read
 }.
 
+Instance MonadI_N_IO : MonadI N IO := {
+  read := read_of_int n_of_int;
+}.
+
 Instance MonadI_Z_IO : MonadI Z IO := {
-  read := IO.read_Z;
+  read := read_of_int z_of_int;
+}.
+
+Instance MonadI_nat_IO : MonadI nat IO := {
+  read := read_of_int nat_of_int;
+}.
+
+Instance MonadO_N_IO : MonadO N IO := {
+  print := print_to_int int_of_n;
 }.
 
 Instance MonadO_nat_IO : MonadO nat IO := {
-  print := IO.print_nat;
+  print := print_to_int int_of_nat;
 }.
 
 Instance MonadO_Z_IO : MonadO Z IO := {
-  print := IO.print_Z;
+  print := print_to_int int_of_z;
 }.
 
 Instance MonadO_string_IO : MonadO string IO := {
