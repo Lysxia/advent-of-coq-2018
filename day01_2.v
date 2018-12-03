@@ -73,15 +73,6 @@ Section spec.
 Definition psums : Stream Z -> Stream Z :=
   Str_scanl Z.add 0%Z.
 
-(*
-(* [all_distinct xs]: the elements of [xs] are all distinct from
-   each other. *)
-Definition all_distinct {A : Type} (xs : list A) : Prop :=
-  forall pre x suf,
-    xs = pre ++ x :: suf ->
-    ~List.In x pre /\ ~List.In x suf.
-*)
-
 (* [dup n xs]: The [n]-th element of [xs] already occured before. *)
 Definition dup {A : Type} (n : nat) (xs : Stream A) : Prop :=
   List.In (Str_nth n xs) (Str_take n xs).
