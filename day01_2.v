@@ -14,7 +14,16 @@ Local Open Scope monad.
 
 From advent Require Import lib.
 
+(* Sets of integers. *)
 Module ZSet := FSetAVL.Make Z_as_OT.
+
+(* [cycle xs]: given a list [xs], construct an infinite stream
+   repeating [xs]. For example (abusing list notation for streams):
+
+     cycle [1; 2; 3] = Some [1; 2; 3; 1; 2; 3; ...]
+
+   [None] if the list [xs] is empty.
+ *)
 
 Definition cycle_aux {A} (self : Stream A) : list A -> Stream A :=
   cofix cycle_aux (xs : list A) : Stream A :=
@@ -23,6 +32,8 @@ Definition cycle_aux {A} (self : Stream A) : list A -> Stream A :=
     | x :: xs => Cons x (cycle_aux xs)
     end.
 
+(* This might look a bit weird, because of the guardedness
+   condition. *)
 Definition cycle {A} (xs : list A) : option (Stream A) :=
   match xs with
   | [] => None
@@ -35,12 +46,22 @@ Context {m : Type -> Type}
         `{Monad m} `{MonadError m}
         `{MonadI Z m} `{MonadO Z m} `{MonadFix m}.
 
+(* Get all inputs and make a cyclic stream of them. *)
 Definition parse_stream : m (Stream Z) :=
   zs <- read_all;;
   match cycle zs with
   | None => error "empty input"
   | Some s => ret s
   end.
+
+(* [search s]: viewing [s] as a stream of deltas, we replay the
+   changes, keeping all reached positions in a set. We return the
+   first duplicate position, if any. Otherwise we keep looping,
+   hence this computation must be done in a suitable monad
+   (with a [MonadFix] instance).
+
+   Its specification is given (and proved) below by [search_rel].
+ *)
 
 Definition no_seen : ZSet.t := ZSet.empty.
 
@@ -107,6 +128,8 @@ Proof.
   firstorder.
 Qed.
 
+(* Specification of [search]: if there is a duplicate
+   position/frequency, return the first one. *)
 Theorem search_rel (s0 : io_state Z Z) xs n :
   first_dup n (psums xs) ->
   search xs s0 s0 (Str_nth n (psums xs)).
@@ -189,6 +212,7 @@ Proof.
   }
 Qed.
 
+(* Final correctness theorem. *)
 Theorem correct_main : correct main.
 Proof.
   intros zs xs n Hzs Hn.

@@ -18,6 +18,7 @@ Section main.
 Context {m : Type -> Type} `{Monad m}
         `{MonadI Z m} `{MonadO Z m} `{MonadFix m}.
 
+(* Read integers and accumulate their sum. *)
 Definition main : m unit :=
   mfix (fun loop z0 =>
     oz <- read;;
@@ -34,20 +35,24 @@ Definition exec : io_unit := unsafe_run main.
 
 Extraction "day01_1.ml" exec.
 
-(**)
 
-(* Functional spec. *)
+Section spec.
+
+(* Sum of a list of numbers. *)
 Fixpoint sum_Z (zs : list Z) : Z :=
   match zs with
   | [] => 0
   | z :: zs => z + sum_Z zs
   end.
 
-(* If you run [main] with the input [zs], then
-   the printed output will be exactly [sum_Z zs]. *)
-Theorem main_correct zs :
-  rel_spec Z Z main zs [sum_Z zs].
+(* If you run [main] with the input [zs], then the printed output
+   will be exactly [sum_Z zs]. *)
+Definition correct (main : io_rel Z Z unit) : Prop :=
+  forall zs, rel_spec Z Z main zs [sum_Z zs].
+
+Theorem correct_main : correct main.
 Proof.
+  intros zs.
   unfold rel_spec.
   exists (Mk_io_state [] [sum_Z zs]); split; [| auto].
   unfold rel_spec, main; simpl.
@@ -76,3 +81,5 @@ Proof.
   }
   apply H.
 Qed.
+
+End spec.
