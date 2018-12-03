@@ -1,6 +1,19 @@
 Advent of Code 2018 in Coq
 ==========================
 
+This repository contains formally verified solutions for the Advent
+of Code 2018 (https://adventofcode.com/2018). This is an example of
+applying verification to small programming challenges of that kind.
+(If you're aiming for prizes, this is probably not the way to go.)
+
+Project status
+--------------
+
+As of December 2, the two solutions of Day 1's challenge are
+verified (significant caveats apply).
+
+Read more about my approach in [`SUMMARY.md`](./SUMMARY.md).
+
 Dependencies
 ------------
 
