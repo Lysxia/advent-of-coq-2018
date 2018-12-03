@@ -55,6 +55,56 @@ Proof.
     reflexivity.
 Qed.
 
+Lemma iter_cons {A : Type} (a : A) (n : nat) (xs : list A) :
+  PeanoNat.Nat.iter n (cons a) xs = repeat a n ++ xs.
+Proof.
+  induction n; simpl; auto.
+  rewrite IHn; auto.
+Qed.
+
+Lemma repeat_nth1 {A : Type} (m n : nat) (a b : A) :
+  m < n -> nth m (repeat a n) b = a.
+Proof.
+  generalize dependent n.
+  induction m; intros; destruct n; auto; try solve [inversion H].
+  apply IHm, Lt.lt_S_n; auto.
+Qed.
+
+Lemma repeat_nth2 {A : Type} (m n : nat) (a b : A) :
+  n <= m -> nth m (repeat a n) b = b.
+Proof.
+  generalize dependent n.
+  induction m; intros; destruct n; auto; try solve [inversion H].
+  apply IHm, le_S_n; auto.
+Qed.
+
+Lemma nth_nil {A : Type} (n : nat) (a : A) :
+  nth n [] a = a.
+Proof.
+  destruct n; auto.
+Qed.
+
+Lemma fold_left_hom {A B C}
+      (f : A -> B -> A) (g : C -> B -> C) (h : A -> C) xs y :
+  (forall a b, h (f a b) = g (h a) b) ->
+  h (fold_left f xs y) = fold_left (fun a b => g a b) xs (h y).
+Proof.
+  intros.
+  generalize dependent y.
+  induction xs; auto; intros; simpl.
+  rewrite IHxs, H; auto.
+Qed.
+
+Lemma fold_left_map {A B C} (f : A -> B -> A) (g : C -> B) xs y :
+  fold_left (fun y x => f y (g x)) xs y = fold_left f (map g xs) y.
+Proof.
+  revert y.
+  induction xs; auto; intros; simpl.
+  rewrite IHxs; auto.
+Qed.
+
+(* Monadic stuff *)
+
 (* TODO: send to ext-lib *)
 Fixpoint for' {m : Type -> Type} `{Monad m} {A : Type}
          (xs : list A) (f : A -> m unit) : m unit :=
