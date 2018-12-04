@@ -1,4 +1,4 @@
-.PHONY: all lib
+.PHONY: all test-all lib clean
 
 all: day01_1.native day01_2.native \
 	day02_1.native day02_2.native \
@@ -23,3 +23,6 @@ Makefile.coq: _CoqProject
 %.native: lib %.v
 	coqc -Q . advent $*.v
 	ocamlc $*.mli $*.ml -o $@
+
+clean:
+	$(RM) **/*.glob **/*.vo *.glob *.vo *.cmi *.cmo day*.ml day*.mli *.native Makefile.coq Makefile.coq.conf
