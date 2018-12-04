@@ -1,3 +1,5 @@
+Set Warnings "-extraction-opaque-accessed".
+
 From Coq Require Import
      List Arith Ascii String
      OrderedTypeEx FMapAVL
