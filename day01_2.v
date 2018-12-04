@@ -104,6 +104,8 @@ Definition first_dup {A : Type} (n : nat) (xs : Stream A) : Prop :=
   forall m, m < n -> ~ dup m xs.
 
 (* [main] outputs the value of the first duplicate, if there is one. *)
+(* TODO: we can also add that, if [main] terminates, then the output
+   is indeed the first duplicate (which thus exists). *)
 Definition correct (main : io_rel Z Z unit) : Prop :=
   forall zs xs n,
     cycle zs = Some xs ->
