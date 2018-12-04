@@ -13,8 +13,7 @@ From Coq Require Import
      Lia.
 Import ListNotations.
 
-From SimpleIO Require
-     IOMonad OcamlPervasives.
+From SimpleIO Require SimpleIO.
 
 From ExtLib Require Import
      Structures.Monads.
@@ -249,8 +248,8 @@ End main.
 
 Module io.
 
-Import SimpleIO.IOMonad SimpleIO.OcamlPervasives SimpleIO.Utils.
-Import IONotations.
+Import SimpleIO.
+Import IO.Notations.
 
 Parameter parse_rectangle : ocaml_string -> int * int * int * int * int.
 Extract Constant parse_rectangle =>
@@ -274,10 +273,10 @@ Definition show_matrix_exec : io_unit := unsafe_run (show_matrix 0 0).
 Extraction "day03_1_show_matrix.ml" show_matrix_exec.
 *)
 
-Definition exec1 : io_unit := unsafe_run main1.
+Definition exec1 : io_unit := IO.unsafe_run main1.
 Extraction "day03_1_basic.ml" exec1.
 
-Definition exec2 : io_unit := unsafe_run main2.
+Definition exec2 : io_unit := IO.unsafe_run main2.
 Extraction "day03_1.ml" exec2.
 
 (* We first verify the naive solution. *)

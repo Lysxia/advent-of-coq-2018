@@ -12,8 +12,7 @@ From ExtLib Require Import
      Data.Monads.OptionMonad
      Structures.Monads.
 
-From SimpleIO Require Import
-     IOMonad CoqPervasives Utils.
+From SimpleIO Require Import RawChar.
 
 From advent.lib Require Import
      string.
@@ -55,15 +54,15 @@ End Combini.
 
 Module IO.
 
-Import IONotations.
+Import IO.Notations.
 
 Instance Monad_IO : Monad IO := {
-  Monad.ret := @IOMonad.ret;
-  Monad.bind := @IOMonad.bind;
+  Monad.ret := @IO.ret;
+  Monad.bind := @IO.bind;
 }.
 
 Instance MonadFix_IO : MonadFix IO := {
-  mfix := @fix_io;
+  mfix := @IO.fix_io;
 }.
 
 Definition error (a : Type) (s : string) : IO a :=
@@ -71,7 +70,7 @@ Definition error (a : Type) (s : string) : IO a :=
 
 Definition read_of_int {A : Type} (of_int : int -> A)
   : IO (option A) :=
-  catch_eof (map_io of_int read_int).
+  catch_eof (IO.map of_int read_int).
 
 Definition print_to_int {A : Type} (to_int : A -> int)
            (n : A) : IO unit :=
@@ -87,7 +86,7 @@ Instance MonadI_string_IO : MonadI string IO := {
 }.
 
 Instance MonadI_list_ascii_IO : MonadI (list ascii) IO := {
-  read := map_io (option_map list_of_string) read
+  read := IO.map (option_map list_of_string) read
 }.
 
 Instance MonadI_N_IO : MonadI N IO := {

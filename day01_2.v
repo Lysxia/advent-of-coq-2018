@@ -4,8 +4,7 @@ From Coq Require Import
      extraction.ExtrOcamlIntConv.
 Import ListNotations.
 
-From SimpleIO Require
-     IOMonad CoqPervasives.
+From SimpleIO Require SimpleIO.
 
 From ExtLib Require Import
      Structures.Monads.
@@ -82,7 +81,7 @@ End main.
 
 Import SimpleIO.IOMonad.
 
-Definition exec : io_unit := unsafe_run main.
+Definition exec : io_unit := IO.unsafe_run main.
 
 Extraction "day01_2.ml" exec.
 

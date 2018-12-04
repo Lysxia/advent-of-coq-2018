@@ -6,8 +6,7 @@ From Coq Require Import
      Lia.
 Import ListNotations.
 
-From SimpleIO Require
-     IOMonad OcamlPervasives.
+From SimpleIO Require SimpleIO.
 
 From ExtLib Require Import
      Structures.Monads.
@@ -111,8 +110,8 @@ End main.
 
 Module io.
 
-Import SimpleIO.IOMonad SimpleIO.OcamlPervasives SimpleIO.Utils.
-Import IONotations.
+Import SimpleIO.
+Import IO.Notations.
 
 Parameter parse_rectangle : ocaml_string -> int * int * int * int * int.
 Extract Constant parse_rectangle =>
@@ -128,7 +127,7 @@ Instance MonadI_rectangle_IO : MonadI rectangle IO := {
 
 End io.
 
-Import SimpleIO.IOMonad.
+Import SimpleIO.
 
-Definition exec : io_unit := unsafe_run main.
+Definition exec : io_unit := IO.unsafe_run main.
 Extraction "day03_2.ml" exec.
