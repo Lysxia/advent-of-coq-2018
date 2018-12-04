@@ -34,9 +34,14 @@ Install the development version of coq-simple-io with opam
 ----------------------------------------------------------
 
 ```sh
-opam pin add coq-simple-io --dev-repo
+# Get the source
+git clone https://github.com/Lysxia/coq-simple-io
+
+# Register the local version of coq-simple-io with opam
+opam pin add -k git coq-simple-io ./coq-simple-io
 
 # When coq-simple-io is updated
+cd coq-simple-io && git pull coq-simple-io
 opam reinstall coq-simple-io
 ```
 
