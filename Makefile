@@ -1,7 +1,8 @@
 .PHONY: all lib
 
 all: day01_1.native day01_2.native \
-	day02_1.native day02_2.native
+	day02_1.native day02_2.native \
+	day03_1.native day03_2.native
 
 test-all: all
 	./day01_1.native < day01.example
@@ -10,6 +11,8 @@ test-all: all
 	./day02_1.native < day02.example.bis
 	./day02_2.native < day02.example
 	./day02_2.native < day02.example.bis
+	./day03_1.native < day03.example
+	./day03_2.native < day03.example
 
 lib: Makefile.coq
 	$(MAKE) -f Makefile.coq
