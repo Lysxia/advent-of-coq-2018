@@ -121,4 +121,8 @@ Instance MonadO_list_ascii_IO : MonadO (list ascii) IO := {
   print := fun s => print_endline (string_of_list s);
 }.
 
+Instance MonadO_ocaml_string_IO : MonadO ocaml_string IO := {
+  print := print_endline';
+}.
+
 End IO.
