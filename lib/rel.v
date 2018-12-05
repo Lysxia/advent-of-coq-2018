@@ -8,6 +8,7 @@
 
 From Coq Require Import
      List ZArith String
+     RelationClasses
      extraction.ExtrOcamlIntConv.
 Import ListNotations.
 
@@ -19,7 +20,7 @@ From ExtLib Require Import
      Structures.Monads.
 
 From advent.lib Require Import
-     io.
+     io utils.
 
 (* First, some general definitions about state [S -> (S * A)].
    We then specialize [S] to a simple model of IO state. *)
@@ -47,6 +48,12 @@ Definition incl_rel {S A : Type} (r1 r2 : state_rel S A) :=
 (* Logical equivalence. *)
 Definition eq_rel {S A : Type} (r1 r2 : state_rel S A) :=
   incl_rel r1 r2 /\ incl_rel r2 r1.
+
+Instance Transitive_incl_rel {S A} : Transitive (@incl_rel S A).
+Proof. firstorder. Qed.
+
+Instance Transitive_eq_rel {S A} : Transitive (@eq_rel S A).
+Proof. firstorder. Qed.
 
 (* For [mfix], we will be manipulating relations with an extra
    parameter: [A -> S -> S -> B -> Prop]. *)
@@ -225,17 +232,16 @@ Instance MonadO_io_rel (I O : Type) : MonadO O (io_rel I O) := {
     x' = tt
 }.
 
-(* Specification of [read_all]: it consumes all the input and
-   returns it in a list. *)
-Lemma read_all_rel {I O : Type} :
-  eq_rel read_all
-         (fun (s1 s2 : io_state I O) xs =>
-            xs = input s1 /\
+(* Specification of [fold_read]. *)
+Lemma fold_read_rel {I O A : Type} (f : A -> I -> A) (a0 : A) :
+  eq_rel (fold_read f a0)
+         (fun (s1 s2 : io_state I O) (a1 : A) =>
+            a1 = fold_left f (input s1) a0 /\
             s2 = Mk_io_state [] (output s1)).
 Proof.
   split.
   - intros s1 s2 xs.
-    unfold read_all.
+    unfold fold_read.
     match goal with
     | [ |- mfix ?body _ _ _ _ -> _ ] =>
       assert (mon_body : monotonic_rel1 body)
@@ -248,10 +254,10 @@ Proof.
     }
     match goal with
     | [ |- mfix ?body _ _ _ _ -> _ ] =>
-      assert (H : forall acc s1 s2 xs,
-                 lfp_rel1 body acc s1 s2 xs ->
-                 xs = rev acc ++ input s1 /\
-                 s2 = Mk_io_state [] (output s1))
+      assert (H : forall acc s1 s2 a1,
+                 lfp_rel1 body acc s1 s2 a1 ->
+                 a1 = fold_left f (input s1) acc /\
+                 s2 = Mk_io_state [] (output s1)); [|auto]
     end.
     { revert mon_body; clear; intros mon_body acc [is1 os1].
       revert acc. induction is1 as [| i1 is1]; intros acc s2 xs Hloop.
@@ -260,10 +266,7 @@ Proof.
         destruct Hread as [[i1 [Hi1]] | [Hi [Hs1' Hox]]].
         + discriminate Hi1.
         + subst ox.
-          destruct Hloop; subst; simpl.
-          split.
-          * rewrite app_nil_r. rewrite rev_alt. reflexivity.
-          * reflexivity.
+          destruct Hloop; subst; auto.
       - apply lfp_rel_unfold in Hloop; auto.
         destruct Hloop as [ox [s1' [Hread Hloop]]].
         destruct Hread as [[i1' [Hi1 [Hs1' Hox]]] | [Hs1' Hox]].
@@ -271,20 +274,17 @@ Proof.
           simpl in Hi1; inversion Hi1; subst.
           apply IHis1 in Hloop.
           destruct Hloop as [Hxs Hs2]. subst.
-          simpl.
-          rewrite <- app_assoc.
           auto.
         + discriminate.
     }
-    apply H.
-  - intros s1 s2 is1 [His1 Hs2].
-    unfold read_all.
+  - intros s1 s2 a1 [Ha1 Hs2].
+    unfold fold_read.
     match goal with
     | [ |- mfix ?body _ _ _ _ ] =>
-      assert (H : forall acc s1 s2 is1,
-                 is1 = rev acc ++ input s1 ->
+      assert (H : forall acc s1 s2 a1,
+                 a1 = fold_left f (input s1) acc ->
                  s2 = Mk_io_state [] (output s1) ->
-                 lfp_rel1 body acc s1 s2 is1)
+                 lfp_rel1 body acc s1 s2 a1); [| apply H; auto]
     end.
     { clear.
       intros acc s1. revert acc.
@@ -294,18 +294,39 @@ Proof.
         intros s1 Hs1 acc s2 xs His1 Hs2;
         apply lfp_rel_fold.
       + exists None, s2.
-        rewrite app_nil_r in His1.
         split.
         * right; destruct s1, s2; simpl in *; subst; auto.
-        * rewrite rev_alt in His1; simpl; auto.
+        * simpl; auto.
       + exists (Some i1), (Mk_io_state is1 (output s1)).
         split.
         * left. exists i1. simpl.
           destruct s1; simpl in *; subst; auto.
         * apply IH; auto.
-          simpl.
-          rewrite <- app_assoc.
-          auto.
     }
-    apply H; auto.
+Qed.
+
+(* Specification of [read_all]: it consumes all the input and
+   returns it in a list. *)
+Lemma read_all_rel {I O : Type} :
+  eq_rel read_all
+         (fun (s1 s2 : io_state I O) xs =>
+            xs = input s1 /\
+            s2 = Mk_io_state [] (output s1)).
+Proof.
+  split; intros s1 s2 a1.
+  - intros [is1' [s1' [H1' [? ?]]]]; subst.
+    apply fold_read_rel in H1'.
+    rewrite fold_left_cons in H1'.
+    destruct H1'; subst.
+    unfold rev'; rewrite <- rev_alt, rev_involutive.
+    auto.
+  - intros [? ?]; subst.
+    exists (rev (input s1)). eexists.
+    split.
+    + apply fold_read_rel.
+      split.
+      * rewrite fold_left_cons; auto.
+      * reflexivity.
+    + unfold rev'; rewrite <- rev_alt, rev_involutive.
+      simpl; auto.
 Qed.

@@ -103,6 +103,19 @@ Proof.
   rewrite IHxs; auto.
 Qed.
 
+Lemma fold_left_cons_1 {A : Type} (xs ys : list A) :
+  fold_left (fun xs x => x :: xs) xs ys = rev xs ++ ys.
+Proof.
+  revert ys; induction xs; intros; simpl; auto.
+  rewrite <- app_assoc; auto.
+Qed.
+
+Lemma fold_left_cons {A : Type} (xs : list A) :
+  fold_left (fun xs x => x :: xs) xs [] = rev xs.
+Proof.
+  rewrite fold_left_cons_1. rewrite app_nil_r. reflexivity.
+Qed.
+
 (* Monadic stuff *)
 
 (* TODO: send to ext-lib *)

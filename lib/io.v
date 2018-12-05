@@ -39,14 +39,21 @@ Section Combini.
 Import MonadNotation.
 Open Scope monad.
 
-Definition read_all {I : Type} {m : Type -> Type}
-           `{Monad m} `{MonadI I m} `{MonadFix m} : m (list I) :=
-  mfix (fun loop xs =>
+Context {I : Type} {m : Type -> Type}
+        `{Monad m} `{MonadFix m} `{MonadI I m}.
+
+(* Consume all input with a fold. *)
+Definition fold_read {S : Type} (f : S -> I -> S) (s0 : S) : m S :=
+  mfix (fun loop s =>
     ox <- read;;
     match ox with
-    | None => Monad.ret (rev' xs)
-    | Some x => loop (x :: xs)
-    end) [].
+    | None => Monad.ret s
+    | Some x => loop (f s x)
+    end) s0.
+
+Definition read_all : m (list I) :=
+  ys <- fold_read (fun xs x => x :: xs) [];;
+  ret (rev' ys).
 
 End Combini.
 
