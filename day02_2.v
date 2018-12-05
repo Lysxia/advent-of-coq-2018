@@ -28,7 +28,7 @@ Fixpoint distance_one_aux
     if eqb x x' then
       distance_one_aux (x :: acc) xs xs'
     else if eqb_list eqb xs xs' then
-      Some (rev acc ++ xs)
+      Some (rev' acc ++ xs)
     else
       None
   | _, _ => None
