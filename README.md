@@ -52,6 +52,6 @@ Build
 To compile and run `day01_1.v` for example:
 
 ```sh
-make day01_1.native
-./day01_1.native < day01.example
+make exe/day01_1
+./exe/day01_1 < txt/day01
 ```

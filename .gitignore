@@ -4,3 +4,4 @@ day*.mli
 *.cmi
 *.cmx
 *.native
+exe/
