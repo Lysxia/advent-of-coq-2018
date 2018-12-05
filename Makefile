@@ -3,7 +3,8 @@
 all: day01_1.native day01_2.native \
 	day02_1.native day02_2.native \
 	day03_1.native day03_2.native \
-	day04_1.native
+	day04_1.native \
+	day05_1.native day05_2.native
 
 test-all: all
 	./day01_1.native < day01.example
@@ -15,6 +16,8 @@ test-all: all
 	./day03_1.native < day03.example
 	./day03_2.native < day03.example
 	./day04_1.native < day04.example
+	./day05_1.native < day05.example
+	./day05_2.native < day05.example
 
 lib: Makefile.coq
 	$(MAKE) -f Makefile.coq
