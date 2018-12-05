@@ -35,15 +35,27 @@ Class MonadO (O : Type) (m : Type -> Type) : Type := {
 
 (* Extra combinators *)
 
+(* [fold_read] can be implemented using [mfix] (and we do so below),
+   but there are some monads for which [fold_read] can be defined
+   [mfix] cannot. Hence we make a type class to keep this general.
+ *)
+Class FoldRead (I : Type) (m : Type -> Type) : Type :=
+  fold_read : forall (S : Type), (S -> I -> S) -> S -> m S.
+
+Arguments fold_read {I m FoldRead S}.
+
 Section Combini.
 Import MonadNotation.
 Open Scope monad.
 
-Context {I : Type} {m : Type -> Type}
-        `{Monad m} `{MonadFix m} `{MonadI I m}.
+Context {I : Type} {m : Type -> Type} `{Monad m}.
+
+Section DefFoldRead.
+Context `{MonadFix m} `{MonadI I m}.
 
 (* Consume all input with a fold. *)
-Definition fold_read {S : Type} (f : S -> I -> S) (s0 : S) : m S :=
+Global Instance FoldRead_MonadFix : FoldRead I m :=
+  fun {S : Type} (f : S -> I -> S) (s0 : S) =>
   mfix (fun loop s =>
     ox <- read;;
     match ox with
@@ -51,9 +63,16 @@ Definition fold_read {S : Type} (f : S -> I -> S) (s0 : S) : m S :=
     | Some x => loop (f s x)
     end) s0.
 
+End DefFoldRead.
+
+Section DefReadAll.
+Context `{FoldRead I m}.
+
 Definition read_all : m (list I) :=
   ys <- fold_read (fun xs x => x :: xs) [];;
   ret (rev' ys).
+
+End DefReadAll.
 
 End Combini.
 

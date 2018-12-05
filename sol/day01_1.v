@@ -15,7 +15,7 @@ From advent Require Import lib.
 Section main.
 
 Context {m : Type -> Type} `{Monad m}
-        `{MonadI Z m} `{MonadO Z m} `{MonadFix m}.
+        `{FoldRead Z m} `{MonadO Z m}.
 
 (* Read integers and accumulate their sum. *)
 Definition main : m unit :=

@@ -241,7 +241,7 @@ Lemma fold_read_rel {I O A : Type} (f : A -> I -> A) (a0 : A) :
 Proof.
   split.
   - intros s1 s2 xs.
-    unfold fold_read.
+    unfold fold_read, FoldRead_MonadFix.
     match goal with
     | [ |- mfix ?body _ _ _ _ -> _ ] =>
       assert (mon_body : monotonic_rel1 body)
@@ -278,7 +278,7 @@ Proof.
         + discriminate.
     }
   - intros s1 s2 a1 [Ha1 Hs2].
-    unfold fold_read.
+    unfold fold_read, FoldRead_MonadFix.
     match goal with
     | [ |- mfix ?body _ _ _ _ ] =>
       assert (H : forall acc s1 s2 a1,

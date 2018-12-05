@@ -42,8 +42,8 @@ Definition react_f (stack : list int) (c : int) : list int :=
 
 Section main.
 
-Context {m : Type -> Type} `{Monad m} `{MonadFix m}
-        `{MonadI int m} `{MonadO nat m}.
+Context {m : Type -> Type} `{Monad m}
+        `{FoldRead int m} `{MonadO nat m}.
 
 Definition main : m unit :=
   stack <- fold_read react_f [];;

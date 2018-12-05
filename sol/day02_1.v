@@ -55,7 +55,7 @@ Module Import A := Algorithm Ascii_OT.
 Section main.
 
 Context {m : Type -> Type} `{Monad m}
-        `{MonadI (list ascii) m} `{MonadO nat m} `{MonadFix m}.
+        `{FoldRead (list ascii) m} `{MonadO nat m}.
 
 (* We have two counters for the numbers of words containing
    two/three of any letter. For each word, [two_or_three] tells us
