@@ -156,18 +156,13 @@ End Ascii_OT.
 Definition eqb_ascii (a b : ascii) : bool :=
   if Ascii_OT.eq_dec a b then true else false.
 
-Lemma eqb_eq (a b : ascii) : eqb_ascii a b = true -> a = b.
+Lemma eqb_eq (a b : ascii) : eqb_ascii a b = true <-> a = b.
 Proof.
   unfold eqb_ascii.
-  destruct Ascii_OT.eq_dec.
-  - auto.
-  - discriminate.
+  destruct Ascii_OT.eq_dec; split; auto. discriminate.
 Qed.
 
-Lemma eq_eqb (a b : ascii) : a = b -> eqb_ascii a b = true.
+Lemma neqb_neq (a b : ascii) : eqb_ascii a b = false <-> a <> b.
 Proof.
-  unfold eqb_ascii.
-  destruct Ascii_OT.eq_dec.
-  - auto.
-  - contradiction.
+  rewrite <- eqb_eq, Bool.not_true_iff_false; reflexivity.
 Qed.
