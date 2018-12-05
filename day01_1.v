@@ -19,12 +19,7 @@ Context {m : Type -> Type} `{Monad m}
 
 (* Read integers and accumulate their sum. *)
 Definition main : m unit :=
-  mfix (fun loop z0 =>
-    oz <- read;;
-    match oz with
-    | None => print z0
-    | Some z => loop (z + z0)%Z
-    end) 0%Z.
+  fold_read (fun z0 z => z0 + z)%Z 0%Z >>= print.
 
 End main.
 
@@ -44,6 +39,17 @@ Fixpoint sum_Z (zs : list Z) : Z :=
   | z :: zs => z + sum_Z zs
   end.
 
+Lemma sum_Z_fold (zs : list Z) :
+  sum_Z zs = fold_left Z.add zs 0%Z.
+Proof.
+  assert
+    (H : forall zs z0, fold_left Z.add zs z0 = (z0 + sum_Z zs)%Z).
+  - clear. induction zs; intro z; simpl.
+    + rewrite Z.add_0_r. auto.
+    + rewrite Z.add_assoc. auto.
+  - rewrite H; auto.
+Qed.
+
 (* If you run [main] with the input [zs], then the printed output
    will be exactly [sum_Z zs]. *)
 Definition correct (main : io_rel Z Z unit) : Prop :=
@@ -54,31 +60,12 @@ Proof.
   intros zs.
   unfold rel_spec.
   exists (Mk_io_state [] [sum_Z zs]); split; [| auto].
-  unfold rel_spec, main; simpl.
-  match goal with
-  | [ |- lfp_rel1 ?body _ _ _ _ ] =>
-    assert (H : forall z0 zs,
-               lfp_rel1 body z0 (initial zs)
-                       (Mk_io_state [] [(z0 + sum_Z zs)%Z]) tt)
-  end.
-  { clear zs.
-    intros z0 zs.
-    revert z0; induction zs as [|z zs IH]; intros z0; apply lfp_rel_fold.
-    - exists None, (initial []).
-      repeat (split; auto).
-      simpl. repeat f_equal.
-      apply Z.add_0_r.
-    - exists (Some z), (initial zs).
-      repeat (split; auto).
-      + left. exists z; auto.
-      + simpl.
-        replace (z0 + (z + sum_Z zs))%Z with ((z + z0) + sum_Z zs)%Z.
-        apply IH.
-        rewrite Z.add_assoc.
-        rewrite (Z.add_comm z).
-        reflexivity.
-  }
-  apply H.
+  exists (sum_Z zs); eexists.
+  split.
+  - apply fold_read_rel.
+    split; [| reflexivity].
+    apply sum_Z_fold.
+  - simpl; auto.
 Qed.
 
 End spec.

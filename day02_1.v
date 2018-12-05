@@ -61,16 +61,12 @@ Context {m : Type -> Type} `{Monad m}
    two/three of any letter. For each word, [two_or_three] tells us
    whether to increment each counter. *)
 Definition main : m unit :=
-  mfix (fun loop '(twos, threes) =>
-    oid <- read;;
-    match oid with
-    | Some id =>
+  '(twos, threes) <-
+    fold_read (fun '(twos, threes) id =>
       let tot := two_or_three id in
-      loop (if fst tot then 1+twos else twos,
-            if snd tot then 1+threes else threes)
-    | None =>
-      print (twos * threes)
-    end) (0, 0).
+      (if fst tot then 1+twos else twos,
+       if snd tot then 1+threes else threes)) (0, 0);;
+  print (twos * threes).
 
 End main.
 

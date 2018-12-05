@@ -29,24 +29,24 @@ Definition reactable (c1 c2 : int) : bool :=
   int_eqb (lxor c1 c2)
           (int_of_nat 32).
 
-Fixpoint react (stack cs : list int) : list int :=
-  match cs with
-  | [] => stack
-  | c :: cs =>
+Definition react_f (stack : list int) (c : int) : list int :=
+  if alphanum c then
     match stack with
-    | [] => react [c] cs
+    | [] => [c]
     | c' :: stack' =>
       if reactable c c' then
-        react stack' cs
+        stack'
       else
-        react (c :: stack) cs
+        c :: stack
     end
-  end.
+  else
+    stack.
 
-Definition react0 : list int -> list int := react [].
+Definition react (cs : list int) : list int :=
+  fold_left react_f cs [].
 
 Definition polymer_length : list int -> int :=
-  fun cs => int_of_nat (List.length (react0 cs)).
+  fun cs => int_of_nat (List.length (react cs)).
 
 Definition purge (i : int) : list int -> list int :=
   filter (fun c => int_neqb c i && negb (reactable c i))%bool.

@@ -17,8 +17,6 @@ From advent Require Import lib.
 
 Import SimpleIO.
 
-Module Char.
-
 Parameter lxor : int -> int -> int.
 Extract Inlined Constant lxor => "Pervasives.(lxor)".
 
@@ -29,7 +27,18 @@ Definition reactable (c1 c2 : int) : bool :=
   int_eqb (lxor c1 c2)
           (int_of_nat 32).
 
-End Char.
+Definition react_f (stack : list int) (c : int) : list int :=
+  if alphanum c then
+    match stack with
+    | [] => [c]
+    | c' :: stack' =>
+      if reactable c c' then
+        stack'
+      else
+        c :: stack
+    end
+  else
+    stack.
 
 Section main.
 
@@ -37,25 +46,8 @@ Context {m : Type -> Type} `{Monad m} `{MonadFix m}
         `{MonadI int m} `{MonadO nat m}.
 
 Definition main : m unit :=
-  mfix (fun self stack =>
-    oc <- read;;
-    (* let done := for' (rev' stack) print in *)
-    let done := print (List.length stack) in
-    match oc with
-    | None => done
-    | Some c =>
-      if Char.alphanum c then
-        match stack with
-        | [] => self [c]
-        | c' :: stack' =>
-          if Char.reactable c c' then
-            self stack'
-          else
-            self (c :: stack)
-        end
-      else
-        done
-    end) [].
+  stack <- fold_read react_f [];;
+  print (List.length stack).
 
 End main.
 
