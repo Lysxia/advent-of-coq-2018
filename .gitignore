@@ -4,4 +4,5 @@ day*.mli
 *.cmi
 *.cmx
 *.native
+.lia.cache
 exe/
