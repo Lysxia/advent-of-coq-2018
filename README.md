@@ -31,6 +31,25 @@ Dependencies
 
 Older versions of these are likely to work.
 
+### Optional dependency
+
+- [coq-itree](https://github.com/DeepSpec/InteractionTrees), master
+  A library of free monads and algebraic effects (WIP).
+
+Experimental proofs using `itree` instead of `io_rel` can be found in
+files `sol/day*_*_extra.v`.
+
+To install coq-itree with opam and make it known to advent-of-coq:
+
+```sh
+git clone https://github.com/DeepSpec/InteractionTrees
+opam pin add coq-itree ./InteractionTrees
+
+# Inside advent-of-coq-2018, create a symbolic link _CoqConfig.append to _CoqConfig.extras
+# The -f option overwrites any existing _CoqConfig.append
+ln -sf _CoqConfig.extras _CoqConfig.append
+```
+
 Install the development version of coq-simple-io with opam
 ----------------------------------------------------------
 
