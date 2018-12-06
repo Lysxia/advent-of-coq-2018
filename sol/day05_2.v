@@ -18,7 +18,7 @@ From advent Require Import lib sol.day05_common.
 Import SimpleIO.
 
 Definition polymer_length : list int -> int :=
-  fun cs => int_of_nat (List.length (react cs)).
+  fun cs => int_of_nat (List.length (rev_react cs)).
 
 Definition purge (i : int) : list int -> list int :=
   filter (fun c => int_neqb c i && negb (reactable c i))%bool.
@@ -47,19 +47,6 @@ Definition main : m unit :=
   print z.
 
 End main.
-
-Instance MonadI_int_IO : MonadI int IO := {
-  read :=
-    ox <- catch_eof (input_byte stdin);;
-    match ox with
-    | None => ret None
-    | Some x => ret (if alphanum x then Some x else None)
-    end;
-}.
-
-Instance MonadO_int_IO : MonadO int IO := {
-  print n := print_int n;; print_newline
-}.
 
 Definition exe : io_unit := IO.unsafe_run main.
 Extraction "day05_2.ml" exe.

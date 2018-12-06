@@ -49,8 +49,11 @@ Definition react_f (stack : list int) (c : int) : list int :=
       c :: stack
   end.
 
-Definition react (cs : list int) : list int :=
+Definition rev_react (cs : list int) : list int :=
   fold_left react_f cs [].
+
+Definition react (cs : list int) : list int :=
+  rev (rev_react cs).
 
 Section spec.
 
@@ -73,9 +76,10 @@ Variant react_step : list A -> list A -> Prop :=
     can_react c1 c2 ->
     react_step (cs1 ++ c1 :: c2 :: cs2) (cs1 ++ cs2).
 
-(* Reflexive transitive closure:
-   [react_steps x z] holds when [x] can reach [z] after some
-   number of [react_step]. *)
+Hint Constructors react_step.
+
+(* [react_steps x z] holds when [x] can reach [z] after some
+   number of [react_step]. (Reflexive transitive closure) *)
 Definition react_steps := Rstar _ react_step.
 
 Lemma react_cons_congr1 :
@@ -147,7 +151,7 @@ Proof.
         split; constructor.
       * exists (cs5 ++ cs6); inversion H5; subst.
         split; apply Rstar_contains_R.
-        -- apply RStep; auto.
+        -- auto.
         -- apply (RStep []); auto.
   - destruct cs5; simpl in *.
     + destruct cs3; simpl in *; subst.
@@ -158,7 +162,7 @@ Proof.
       * exists (cs3 ++ cs4); inversion H5; subst.
         split; apply Rstar_contains_R.
         -- apply (RStep []); auto.
-        -- apply RStep; auto.
+        -- auto.
     + specialize IHcs3 with (cs5 := cs5).
       subst; inversion H5; subst; clear H5.
       edestruct IHcs3 as [cs7 [Hcs7 Hcs7']]; eauto.
@@ -167,7 +171,7 @@ Proof.
 Qed.
 
 (* [Noetherian]: there is no infinite sequence of steps.
-   In this case, the length decreases by two. *)
+   In this case, the length decreases by two with every step. *)
 Lemma Noetherian_react_step : Noetherian _ react_step.
 Proof.
   intros cs.
@@ -205,8 +209,8 @@ Corollary react_steps_injective :
     cs1 = cs2.
 Proof.
   intros cs cs1 cs2 [Hcs1 Hinert1] [Hcs2 Hinert2].
-  pose proof (Confluent_react_step cs cs1 cs2 Hcs1 Hcs2) as Hconfl.
-  destruct Hconfl as [cs3 [Hcs13 Hcs23]].
+  pose proof (Confluent_react_step cs cs1 cs2 Hcs1 Hcs2)
+    as [cs3 [Hcs13 Hcs23]].
   destruct Hcs13.
   - destruct Hcs23.
     + reflexivity.
@@ -214,9 +218,178 @@ Proof.
   - exfalso; eapply Hinert1; eauto.
 Qed.
 
+(* Extra lemmas. *)
+
+Lemma react_rev_cong1 :
+  forall cs cs',
+    react_step cs cs' -> react_step (rev cs) (rev cs').
+Proof.
+  intros cs cs' Hcs.
+  inversion Hcs.
+  repeat (rewrite rev_app_distr; simpl).
+  repeat (rewrite <- app_assoc); simpl.
+  constructor.
+  apply can_react_symmetric; auto.
+Qed.
+
+Lemma react_rev_cong :
+  forall cs cs',
+    react_step cs cs' <-> react_step (rev cs) (rev cs').
+Proof.
+  split; intros Hcs'; apply react_rev_cong1 in Hcs'; auto.
+  do 2 rewrite rev_involutive in Hcs'; auto.
+Qed.
+
+Lemma inert_rev_cong1 :
+  forall cs, inert cs -> inert (rev cs).
+Proof.
+  intros cs Hcs cs' Hcs'.
+  eapply Hcs.
+  apply react_rev_cong.
+  rewrite rev_involutive; eauto.
+Qed.
+
+Lemma inert_rev_cong :
+  forall cs, inert cs <-> inert (rev cs).
+Proof.
+  split; intro Hcs; apply inert_rev_cong1 in Hcs; auto.
+  rewrite rev_involutive in Hcs; auto.
+Qed.
+
+Theorem fully_react_rev_cong1 :
+  forall cs cs',
+    fully_react (rev cs) (rev cs') ->
+    fully_react cs cs'.
+Proof.
+  intros cs cs' [Hcs Hinert]; split.
+  - remember (rev cs) as rev_cs.
+    remember (rev cs') as rev_cs'.
+    gd (cs, cs').
+    induction Hcs; intros; subst.
+    + rewrite <- (rev_involutive cs).
+      rewrite <- (rev_involutive cs').
+      rewrite Heqrev_cs'.
+      constructor.
+    + apply react_rev_cong in H1.
+      rewrite rev_involutive in H1.
+      econstructor; eauto.
+      eapply IHHcs; eauto.
+      rewrite rev_involutive; auto.
+  - intros cs''.
+    rewrite react_rev_cong.
+    auto.
+Qed.
+
+Theorem fully_react_rev_cong :
+  forall cs cs',
+    fully_react (rev cs) (rev cs') <->
+    fully_react cs cs'.
+Proof.
+  split; intros; apply fully_react_rev_cong1; auto.
+  do 2 rewrite rev_involutive; auto.
+Qed.
+
+Lemma inert_nil : inert [].
+Proof.
+  intros cs' Hcs'.
+  inversion Hcs'.
+  destruct cs1 as [|? [|]]; try discriminate.
+Qed.
+
+Lemma inert_single a : inert [a].
+Proof.
+  intros cs' Hcs'.
+  inversion Hcs'.
+  destruct cs1 as [|? [|]]; try discriminate.
+Qed.
+
+Lemma inert_cons a c cs :
+  ~ can_react a c -> inert (c :: cs) -> inert (a :: c :: cs).
+Proof.
+  intros Hcanr Hinert cs' Hcs'. inversion Hcs'; clear Hcs'.
+  destruct cs1 eqn:ecs1; simpl in *.
+  - inversion H1; subst; auto.
+  - eapply Hinert.
+    inversion H1; subst; auto.
+Qed.
+
+Lemma inert_uncons a c cs :
+  inert (a :: c :: cs) -> ~ can_react a c /\ inert (c :: cs).
+Proof.
+  intros Hinert; split.
+  - intro Hcanr. apply (Hinert cs), (RStep []); auto.
+  - intros cs' Hcs'.
+    apply (Hinert (a :: cs')), react_cons_congr1; auto.
+Qed.
+
+Lemma inert_unapp cs cs' : inert (cs ++ cs') -> inert cs /\ inert cs'.
+Proof.
+  induction cs.
+  - split; auto. apply inert_nil.
+  - intros H'. destruct cs as [ | ? cs].
+    + destruct cs'.
+      * split; auto. apply inert_nil.
+      * split.
+        -- apply inert_single.
+        -- eapply inert_uncons; eauto.
+    + apply inert_uncons in H' as [H1' H2'].
+      apply IHcs in H2' as [H2' H3'].
+      split; auto.
+      apply inert_cons; auto.
+Qed.
+
 End react_generic.
 
 Global Arguments Reactive : clear implicits.
+Global Arguments GoodReactive : clear implicits.
+Global Arguments GoodReactive A {_}.
+
+Instance Reactive_int : Reactive int :=
+  fun x y => reactable x y = true.
+
+Instance GoodReactive_int : GoodReactive int.
+Admitted.
+
+Theorem react_correct :
+  forall cs, fully_react cs (react cs).
+Proof.
+  unfold react, rev_react.
+  cut (forall cs stack,
+    inert (rev stack) ->
+    fully_react (rev cs ++ stack) (fold_left react_f cs stack)).
+  { intros H cs.
+    specialize (H cs []); rewrite app_nil_r in H.
+    rewrite <- (rev_involutive cs) at 1.
+    rewrite fully_react_rev_cong.
+    apply H.
+    intros cs' Hcs'.
+    inversion Hcs'.
+    destruct cs1; discriminate.
+  }
+  intros cs.
+  induction cs; simpl.
+  - repeat constructor. intros cs Hcs.
+    eapply H.
+    rewrite react_rev_cong in Hcs.
+    eauto.
+  - intros; rewrite <- app_assoc.
+    destruct stack as [|c' stack'] eqn:estack; simpl.
+    + apply IHcs; simpl; clear.
+      apply inert_single.
+    + destruct reactable eqn:e_reactable.
+      simpl in H. apply inert_unapp in H as [H _].
+      apply IHcs in H.
+      * split.
+        { econstructor.
+          - constructor; auto.
+          - apply H.
+        }
+        { apply H. }
+      * apply IHcs.
+        rewrite <- inert_rev_cong in *.
+        apply inert_cons; auto.
+        apply Bool.not_true_iff_false; auto.
+Qed.
 
 End spec.
 
