@@ -13,45 +13,15 @@ From ExtLib Require Import
 Import MonadNotation.
 Local Open Scope monad.
 
-From advent Require Import lib.
+From advent Require Import lib sol.day05_common.
 
 Import SimpleIO.
-
-Module Char.
-
-Parameter lxor : int -> int -> int.
-Extract Inlined Constant lxor => "Pervasives.(lxor)".
-
-Parameter alphanum : int -> bool.
-Extract Constant alphanum => "fun c -> c >= 65".
-
-Definition reactable (c1 c2 : int) : bool :=
-  int_eqb (lxor c1 c2)
-          (int_of_nat 32).
-
-Definition react_f (stack : list int) (c : int) : list int :=
-  if alphanum c then
-    match stack with
-    | [] => [c]
-    | c' :: stack' =>
-      if reactable c c' then
-        stack'
-      else
-        c :: stack
-    end
-  else
-    stack.
-
-Definition react (cs : list int) : list int :=
-  fold_left react_f cs [].
 
 Definition polymer_length : list int -> int :=
   fun cs => int_of_nat (List.length (react cs)).
 
 Definition purge (i : int) : list int -> list int :=
   filter (fun c => int_neqb c i && negb (reactable c i))%bool.
-
-End Char.
 
 Section main.
 
@@ -72,7 +42,7 @@ Definition minimum_in (f : int -> int) (i j : int) : m int :=
 
 Definition main : m unit :=
   cs <- read_all;;
-  z <- minimum_in (fun i => Char.polymer_length (Char.purge i cs))
+  z <- minimum_in (fun i => polymer_length (purge i cs))
     (int_of_n 65) (int_of_n 91);;
   print z.
 
@@ -83,7 +53,7 @@ Instance MonadI_int_IO : MonadI int IO := {
     ox <- catch_eof (input_byte stdin);;
     match ox with
     | None => ret None
-    | Some x => ret (if Char.alphanum x then Some x else None)
+    | Some x => ret (if alphanum x then Some x else None)
     end;
 }.
 

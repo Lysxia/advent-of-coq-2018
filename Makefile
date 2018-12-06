@@ -46,6 +46,8 @@ exe/%: exe sol/%.vo
 sol/%.vo: lib sol/%.v
 	cd sol/ ; coqc -Q .. advent $*.v
 
+sol/day05_1.vo sol/day05_2.vo: sol/day05_common.vo
+
 clean:
 	$(RM) -r exe/
 	$(RM) sol/day*.ml{i,} {*,.}/*.{glob,vo,cmi,cmx,cmo,o} {*,.}/.*.aux {*,.}/.lia.cache .coqdeps.d Makefile.coq Makefile.coq.conf
