@@ -47,7 +47,7 @@ Older versions of these are likely to work.
 
 ### Optional dependency
 
-- [coq-itree](https://github.com/DeepSpec/InteractionTrees), master
+- [coq-itree](https://github.com/DeepSpec/InteractionTrees), master.
   A library of free monads and algebraic effects (WIP).
 
 Experimental proofs using `itree` instead of `io_rel` can be found in
@@ -63,6 +63,9 @@ opam pin add coq-itree ./InteractionTrees
 # to _CoqConfig.extras
 # The -f option overwrites any existing _CoqConfig.append
 ln -sf _CoqConfig.extras _CoqConfig.append
+
+# (Re)generate _CoqProject and compile lib.itree
+make lib
 ```
 
 Install the development version of coq-simple-io with opam
