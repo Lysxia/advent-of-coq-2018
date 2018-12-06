@@ -44,8 +44,8 @@ exe/%: exe sol/%.vo
 	ocamlopt -I sol/ sol/$*.mli sol/$*.ml -o $@
 
 sol/%.vo: lib sol/%.v
-	coqc -Q . advent sol/$*.v
+	cd sol/ ; coqc -Q .. advent $*.v
 
 clean:
-	$(RM) **/*.glob **/*.vo *.glob *.vo sol/day*.ml sol/day*.mli Makefile.coq Makefile.coq.conf
 	$(RM) -r exe/
+	$(RM) sol/day*.ml{i,} {*,.}/*.{glob,vo,cmi,cmx,cmo,o} {*,.}/.*.aux {*,.}/.lia.cache .coqdeps.d Makefile.coq Makefile.coq.conf
