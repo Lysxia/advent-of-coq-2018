@@ -6,3 +6,5 @@ day*.mli
 *.native
 .lia.cache
 exe/
+_CoqConfig.append
+_CoqProject

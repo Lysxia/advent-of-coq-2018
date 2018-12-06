@@ -49,6 +49,13 @@ sol/%.vo: lib sol/%.v
 
 sol/day05_1.vo sol/day05_2.vo: sol/day05_common.vo
 
+# ln -s _CoqConfig.append _CoqConfig.extras
+_CoqConfig.append:
+	touch $@
+
+_CoqProject: _CoqConfig _CoqConfig.append
+	cat _CoqConfig _CoqConfig.append > _CoqProject
+
 clean:
 	$(RM) -r exe/
 	$(RM) sol/day*.ml{i,} {*,.}/*.{glob,vo,cmi,cmx,cmo,o} {*,.}/.*.aux {*,.}/.lia.cache .coqdeps.d Makefile.coq Makefile.coq.conf
