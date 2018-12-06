@@ -7,6 +7,20 @@ This is an example of applying verification to small programming
 challenges of that kind.
 (If you're aiming for prizes, this is probably not the way to go.)
 
+Contributions welcome
+---------------------
+
+It will probably take much longer than the actual span of the AoC to
+complete this project, so any help implementing, specifying, or verifying
+solutions is welcome. If you have any questions, open an issue or send
+me an email (lysxia@gmail.com).
+
+### Suggested tasks
+
+- `day02_2.v`, `day03_2.v` are bare of any verification effort.
+
+- Implement Day 6 (Manhattan geometry).
+
 Project status
 --------------
 
@@ -45,7 +59,8 @@ To install coq-itree with opam and make it known to advent-of-coq:
 git clone https://github.com/DeepSpec/InteractionTrees
 opam pin add coq-itree ./InteractionTrees
 
-# Inside advent-of-coq-2018, create a symbolic link _CoqConfig.append to _CoqConfig.extras
+# Inside advent-of-coq-2018, create a symbolic link _CoqConfig.append
+# to _CoqConfig.extras
 # The -f option overwrites any existing _CoqConfig.append
 ln -sf _CoqConfig.extras _CoqConfig.append
 ```
