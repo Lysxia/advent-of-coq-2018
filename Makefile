@@ -43,6 +43,7 @@ Makefile.coq: _CoqProject
 exe/%: exe sol/%.vo
 	ocamlopt -I sol/ sol/$*.mli sol/$*.ml -o $@
 
+.PRECIOUS: sol/%.vo
 sol/%.vo: lib sol/%.v
 	cd sol/ ; coqc -Q .. advent $*.v
 
