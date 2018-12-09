@@ -6,7 +6,8 @@ all: \
 	exe/day03_1 exe/day03_2 \
 	exe/day04_1 \
 	exe/day05_1 exe/day05_2 \
-	exe/day07_1 exe/day07_2
+	exe/day07_1 exe/day07_2 \
+	exe/day08_1
 
 exe:
 	mkdir exe/
@@ -38,6 +39,8 @@ test-all: all
 	@echo "CABDFE    < Expected output"
 	./exe/day07_2 < ./txt/day07
 	@echo "253       < Expected output"
+	./exe/day08_1 < ./txt/day08
+	@echo "32        < Expected output"
 
 lib: Makefile.coq
 	$(MAKE) -f Makefile.coq
