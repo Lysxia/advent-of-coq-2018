@@ -1,3 +1,22 @@
+(* In this file:
+
+   - [react]: a function to fully reduce a polymer.
+
+   - [react_f]: the core of [react], extracted for
+     use with other folds (partic. [io.fold_read]).
+
+   - [react_step]: a declarative definition of an
+     elementary reaction. Not executable but obviously
+     faithful to the problem description.
+
+   - [react_steps_injective]: a proof that all sequences
+     of [react_step] lead to the same normal form.
+     This shows that the puzzle's answer is unique.
+
+   - [react_correct]: a proof that the function [react]
+     implements the specification [react_step].
+ *)
+
 Set Warnings "-extraction-opaque-accessed".
 
 From Coq Require Import
