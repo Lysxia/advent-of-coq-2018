@@ -104,4 +104,4 @@ End main.
 
 Import SimpleIO.
 Definition exe : io_unit := IO.unsafe_run main.
-Extraction "day08_1.ml" exe.
+Extraction "day09_1.ml" exe.
