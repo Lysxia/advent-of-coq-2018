@@ -7,7 +7,8 @@ all: \
 	exe/day04_1 \
 	exe/day05_1 exe/day05_2 \
 	exe/day07_1 exe/day07_2 \
-	exe/day09_1
+	exe/day09_1 \
+	exe/day10_1
 
 exe:
 	mkdir exe/
@@ -41,6 +42,8 @@ test-all: all
 	@echo "253       < Expected output"
 	./exe/day09_1 < ./txt/day09
 	@echo "32        < Expected output"
+	echo -e "3\n0\n10\n0\n8"|cat - txt/day10|./exe/day10_1
+	@echo "(Should spell HI)"
 
 lib: Makefile.coq
 	$(MAKE) -f Makefile.coq

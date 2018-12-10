@@ -115,6 +115,10 @@ Instance MonadI_list_ascii_IO : MonadI (list ascii) IO := {
   read := IO.map (option_map list_of_string) read
 }.
 
+Instance MonadI_ocaml_string_IO : MonadI ocaml_string IO := {
+  read := catch_eof read_line';
+}.
+
 Instance MonadI_N_IO : MonadI N IO := {
   read := read_of_int n_of_int;
 }.
