@@ -61,6 +61,8 @@ sol/%.vo: lib sol/%.v
 
 sol/day05_1.vo sol/day05_2.vo: sol/day05_common.vo
 
+sol/day16_1.vo sol/day16_2.vo: sol/day16_common.vo
+
 # ln -s _CoqConfig.append _CoqConfig.extras
 _CoqConfig.append:
 	touch $@
