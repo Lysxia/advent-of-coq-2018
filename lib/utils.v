@@ -125,3 +125,14 @@ Fixpoint for' {m : Type -> Type} `{Monad m} {A : Type}
   | [] => ret tt
   | x :: xs => bind (f x) (fun _ => for' xs f)
   end.
+
+(**)
+
+(* A default value for inhabited types. Instances are expected to
+   be made opaque, so that proofs cannot rely on these values.
+[[
+   Instance Dummy_MyType : Dummy MyType.
+   Proof. exact (myValue : MyType). Qed.
+]]
+ *)
+Class Dummy (A : Type) : Type := dummy : A.
