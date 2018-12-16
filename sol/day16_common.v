@@ -1,5 +1,6 @@
 From Coq Require Import
-     String List Arith ZArith.
+     String List Arith ZArith
+     FMapAVL OrderedTypeEx.
 Import ListNotations.
 
 From ExtLib.Structures Require Import
@@ -42,6 +43,37 @@ Definition show_op (o : op) : string :=
   | Eq ri1 ri2 => "eq" ++ show_ri ri1 ++ show_ri ri2
   end.
 
+Definition eqb_ri (ri1 ri2 : RI) : bool :=
+  match ri1, ri2 with
+  | R, R | I, I => true
+  | _, _ => false
+  end.
+
+Lemma eq_eqb_ri ri1 ri2 :
+  ri1 = ri2 -> eqb_ri ri1 ri2 = true.
+Proof.
+  destruct ri1; intros []; reflexivity.
+Qed.
+
+Definition eqb_op o1 o2 : bool :=
+  match o1, o2 with
+  | Add ri1, Add ri2 | Mul ri1, Mul ri2
+  | Ban ri1, Ban ri2 | Bor ri1, Bor ri2
+  | Set' ri1, Set' ri2 =>
+    eqb_ri ri1 ri2
+  | Gt riA1 riB1, Gt riA2 riB2
+  | Eq riA1 riB1, Eq riA2 riB2 =>
+    eqb_ri riA1 riA2 && eqb_ri riB1 riB2
+  | _, _ => false
+  end.
+
+Lemma eq_eqb_op o1 o2 :
+  o1 = o2 -> eqb_op o1 o2 = true.
+Proof.
+  destruct o1; intros []; simpl;
+    repeat rewrite eq_eqb_ri; reflexivity.
+Qed.
+
 Definition all_ops : list op :=
   [ Add R; Add I;
     Mul R; Mul I;
@@ -61,6 +93,12 @@ Variant regs : Type :=
 Definition eqb_reg : regs -> regs -> bool :=
   fun '(Regs r0 r1 r2 r3) '(Regs s0 s1 s2 s3) =>
     ((r0 =? s0) && (r1 =? s1) && (r2 =? s2) && (r3 =? s3))%Z.
+
+Instance Dummy_RI : Dummy RI.
+Proof. exact R. Qed.
+
+Instance Dummy_op : Dummy op.
+Proof. exact (Add dummy). Qed.
 
 Instance Dummy_regs : Dummy regs.
 Proof. exact (Regs 0%Z 0%Z 0%Z 0%Z). Qed.
