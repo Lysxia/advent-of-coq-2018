@@ -108,9 +108,12 @@ Definition test_sample : assignments -> sample -> assignments :=
     match ZMap.find oc p with
     | None => p (* Should not happen. *)
     | Some os =>
-      let os := filter
-                  (fun o => eqb_reg (interp (o, a, b, c) rs) rs')
-                  os in
+      let os :=
+          filter
+            (fun o =>
+               let is := (o, a, b, c) in
+               wf is && eqb_reg (interp is rs) rs')%bool
+            os in
       ZMap.add oc os p
     end.
 

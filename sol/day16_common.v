@@ -139,6 +139,23 @@ Definition binop_ri (f : Z -> Z -> Z)
 Definition boolop {A} (f : A -> A -> bool) : A -> A -> Z :=
   fun i j => if f i j then 1%Z else 0%Z.
 
+Definition is_reg (a : Z) : bool :=
+  ((0 <=? a) && (a <? 4))%Z.
+
+Definition is_ri (ri : RI) (a : Z) : bool :=
+  match ri with
+  | R => is_reg a
+  | I => true
+  end.
+
+Definition wf : instr -> bool :=
+  fun '(o, a, b, _) =>
+    match o with
+    | Add riB | Mul riB | Ban riB
+    | Bor riB | Set' riB => is_ri riB b
+    | Gt riA riB | Eq riA riB => is_ri riA a && is_ri riB b
+    end.
+
 Definition interp : instr -> regs -> regs :=
   fun '(o, a, b, c) rs =>
     match o with

@@ -39,7 +39,8 @@ Definition plausibles : sample -> list op :=
   fun '(rs, a, b, c, rs') =>
     filter
       (fun o =>
-         let b := eqb_reg (interp (o, a, b, c) rs) rs' in
+         let is := (o, a, b, c) in
+         let b := (wf is && eqb_reg (interp is rs) rs')%bool in
          debug (if b then "Y" else "N") (show_op o) b
       )
       all_ops.
