@@ -9,7 +9,7 @@ all: \
 	exe/day07_1 exe/day07_2 \
 	exe/day09_1 \
 	exe/day10_1 \
-	exe/day16_1
+	exe/day16_1 exe/day16_2
 
 exe:
 	mkdir exe/
@@ -19,32 +19,44 @@ test-all: all
 	@echo "3         < Expected output"
 	./exe/day01_2 < ./txt/day01
 	@echo "2         < Expected output"
+
 	./exe/day02_1 < ./txt/day02
 	@echo "12        < Expected output"
 	./exe/day02_1 < ./txt/day02.bis
 	./exe/day02_2 < ./txt/day02
 	./exe/day02_2 < ./txt/day02.bis
 	@echo "fgij      < Expected output"
+
 	./exe/day03_1 < ./txt/day03
 	@echo "4         < Expected output"
 	./exe/day03_2 < ./txt/day03
 	@echo "3         < Expected output"
+
 	./exe/day04_1 < ./txt/day04
 	@echo "240       < Expected output"
 	@echo "TODO day04_2"
 	@echo "4455      < Expected output"
+
 	./exe/day05_1 < ./txt/day05
 	@echo "10        < Expected output"
 	./exe/day05_2 < ./txt/day05
 	@echo "4         < Expected output"
+
 	./exe/day07_1 < ./txt/day07
 	@echo "CABDFE    < Expected output"
 	./exe/day07_2 < ./txt/day07
 	@echo "253       < Expected output"
+
 	./exe/day09_1 < ./txt/day09
 	@echo "32        < Expected output"
+
 	echo -e "3\n0\n10\n0\n8"|cat - txt/day10|./exe/day10_1
 	@echo "(Should spell HI)"
+
+	./exe/day16_1 < ./txt/day16
+	@echo "1         < Expected output"
+	./exe/day16_2 < ./txt/day16.bis
+	@echo "10        < Expected output"
 
 lib: Makefile.coq
 	$(MAKE) -f Makefile.coq
