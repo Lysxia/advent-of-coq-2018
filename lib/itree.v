@@ -4,7 +4,7 @@ From Coq Require Import
 Import ListNotations.
 
 From ITree Require Export
-     ITree OpenSum Eq.Eq Eq.UpToTaus Fix MorphismsFacts.
+     ITree StdEffects MorphismsFacts.
 
 From ExtLib Require Import
      Structures.Monad.
@@ -114,35 +114,40 @@ Lemma spec_fold_read {I O A : Type}
   s2 = Mk_io_state [] (output s1) ->
   itree_spec' (fold_read f a0) s1 s2 (fold_left f (input s1) a0).
 Proof.
+  pose proof @spec_bind as spec_bind. simpl in spec_bind.
   remember (input s1) as i1.
   revert a0 s2. generalize dependent s1.
   induction i1; intros.
   - unfold fold_read, FoldRead_itree.
     rewrite mfix_unfold.
-    eapply spec_bind. simpl. unfold id.
     eapply spec_bind.
-    unfold itree_spec', run_io, run_state.
-    unfold get, lift; rewrite interp_state_liftE.
-    simpl. reflexivity.
-    rewrite <- Heqi1.
-    unfold itree_spec', run_io, run_state.
-    rewrite interp_state_ret. reflexivity.
-    simpl.
-    unfold itree_spec', run_io, run_state.
-    rewrite interp_state_ret.
-    destruct s1.
-    simpl in Heqi1. subst. reflexivity.
+    + eapply spec_bind.
+      * unfold itree_spec', run_io, run_state.
+        unfold get, lift, embed, Embeddable_itree, lift.
+        rewrite interp_state_liftE.
+        simpl. reflexivity.
+      * rewrite <- Heqi1.
+        unfold itree_spec', run_io, run_state. simpl.
+        rewrite interp_state_ret. reflexivity.
+    + simpl.
+      unfold itree_spec', run_io, run_state.
+      rewrite interp_state_ret.
+      destruct s1.
+      simpl in Heqi1. subst. reflexivity.
   - unfold fold_read, FoldRead_itree.
     rewrite mfix_unfold.
     eapply spec_bind. simpl. unfold id.
     eapply spec_bind.
     unfold itree_spec', run_io, run_state.
-    unfold get, lift; rewrite interp_state_liftE.
+    unfold get, lift, embed, Embeddable_itree, lift.
+    rewrite interp_state_liftE.
     simpl. reflexivity.
     rewrite <- Heqi1.
     eapply spec_bind.
     unfold itree_spec', run_io, run_state.
-    unfold put, lift; rewrite interp_state_liftE.
+    unfold put, lift.
+    repeat (unfold embed, Embeddable_forall, Embeddable_itree, lift).
+    rewrite interp_state_liftE.
     simpl. reflexivity.
     unfold itree_spec', run_io, run_state.
     rewrite interp_state_ret.
