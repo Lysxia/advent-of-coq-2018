@@ -17,6 +17,14 @@ From SimpleIO Require Import RawChar.
 From advent.lib Require Import
      string.
 
+Class MonadDebug (m : Type -> Type) : Type :=
+  debug : IO unit -> m unit.
+
+Arguments debug {m _}.
+
+Instance MonadDebug_ignore m `{Monad m} : MonadDebug m :=
+  fun _ => ret tt.
+
 Class MonadError (m : Type -> Type) : Type :=
   error : forall a, string -> m a.
 
@@ -103,6 +111,9 @@ Definition print_to_int {A : Type} (to_int : A -> int)
 Instance MonadError_IO : MonadError IO := {
   error := IO.error;
 }.
+
+Instance MonadDebug_IO : MonadDebug IO :=
+  fun x => x.
 
 Instance MonadI_string_IO : MonadI string IO := {
   read := catch_eof read_line;
