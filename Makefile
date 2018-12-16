@@ -8,7 +8,8 @@ all: \
 	exe/day05_1 exe/day05_2 \
 	exe/day07_1 exe/day07_2 \
 	exe/day09_1 \
-	exe/day10_1
+	exe/day10_1 \
+	exe/day16_1
 
 exe:
 	mkdir exe/
