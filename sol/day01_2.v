@@ -232,7 +232,7 @@ Proof.
   { (* search *)
     apply search_rel; auto.
   }
-  simpl; auto.
+  hnf; auto.
 Qed.
 
 End spec.

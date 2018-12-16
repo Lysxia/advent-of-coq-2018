@@ -65,7 +65,7 @@ Proof.
   - apply fold_read_rel.
     split; [| reflexivity].
     apply sum_Z_fold.
-  - simpl; auto.
+  - hnf; auto.
 Qed.
 
 End spec.
