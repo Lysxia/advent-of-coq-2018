@@ -152,7 +152,8 @@ Definition wf : instr -> bool :=
   fun '(o, a, b, _) =>
     match o with
     | Add riB | Mul riB | Ban riB
-    | Bor riB | Set' riB => is_ri riB b
+    | Bor riB => is_ri riB b
+    | Set' riA => is_ri riA a
     | Gt riA riB | Eq riA riB => is_ri riA a && is_ri riB b
     end.
 
