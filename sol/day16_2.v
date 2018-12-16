@@ -101,6 +101,7 @@ Definition sample_ (regs instr : Type) : Type :=
 Definition sample : Type := sample_ regs instr.
 
 Context {m : Type -> Type} `{Monad m} `{MonadFix m} `{MonadError m}
+        `{MonadDebug m}
         `{FoldRead sample m} `{FoldRead instr m} `{MonadO Z m}.
 
 Definition test_sample : assignments -> sample -> assignments :=

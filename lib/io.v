@@ -22,7 +22,9 @@ Class MonadDebug (m : Type -> Type) : Type :=
 
 Arguments debug {m _}.
 
-Instance MonadDebug_ignore m `{Monad m} : MonadDebug m :=
+(* Keep this out of the instance database by default.
+   It can be added using [Existing Instance MonadDebug_ignore]. *)
+Definition MonadDebug_ignore m `{Monad m} : MonadDebug m :=
   fun _ => ret tt.
 
 Class MonadError (m : Type -> Type) : Type :=
