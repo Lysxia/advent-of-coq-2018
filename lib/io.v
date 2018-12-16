@@ -17,21 +17,18 @@ From SimpleIO Require Import RawChar.
 From advent.lib Require Import
      string.
 
-Class MonadError (m : Type -> Type) : Type := {
-  error : forall a, string -> m a;
-}.
+Class MonadError (m : Type -> Type) : Type :=
+  error : forall a, string -> m a.
 
 Arguments error {m _ a}.
 
 (* Read inputs of type [I]. *)
-Class MonadI (I : Type) (m : Type -> Type) : Type := {
-  read : m (option I);
-}.
+Class MonadI (I : Type) (m : Type -> Type) : Type :=
+  read : m (option I).
 
 (* Print outputs of type [O]. *)
-Class MonadO (O : Type) (m : Type -> Type) : Type := {
-  print : O -> m unit;
-}.
+Class MonadO (O : Type) (m : Type -> Type) : Type :=
+  print : O -> m unit.
 
 (* Extra combinators *)
 
