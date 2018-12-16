@@ -149,7 +149,7 @@ Proof.
     repeat (unfold embed, Embeddable_forall, Embeddable_itree, lift).
     rewrite interp_state_liftE.
     simpl. reflexivity.
-    unfold itree_spec', run_io, run_state.
+    unfold itree_spec', run_io, run_state; simpl.
     rewrite interp_state_ret.
     reflexivity.
     simpl.
