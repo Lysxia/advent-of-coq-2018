@@ -89,15 +89,6 @@ Module IO.
 
 Import IO.Notations.
 
-Instance Monad_IO : Monad IO := {
-  Monad.ret := @IO.ret;
-  Monad.bind := @IO.bind;
-}.
-
-Instance MonadFix_IO : MonadFix IO := {
-  mfix := @IO.fix_io;
-}.
-
 Definition error (a : Type) (s : string) : IO a :=
   prerr_endline s;; exit_nat 1.
 
