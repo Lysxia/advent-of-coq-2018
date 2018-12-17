@@ -8,7 +8,7 @@ From Coq Require Import
      Lia.
 Import ListNotations.
 
-From SimpleIO Require SimpleIOUnsafe RawChar.
+From SimpleIO Require SimpleIO.
 
 From ExtLib Require Import
      Structures.Monads.
@@ -74,7 +74,7 @@ Class TaskDuration : Type :=
   task_duration : Task -> Time.
 
 Module Import DB.
-Import RawChar.
+Import SimpleIO.
 (* TODO send to simple-io. *)
 Definition debug_switch := false. (* Switch this to [true] for debug
                                      output. *)
@@ -179,7 +179,8 @@ Definition main : m unit :=
 
 End main.
 
-Import SimpleIOUnsafe RawChar.
+Import SimpleIO.
+Require Import SimpleIO.IO_Unsafe.
 
 Parameter parse_line : ocaml_string -> IO (char * char).
 Extract Constant parse_line =>
@@ -198,7 +199,7 @@ Definition con (n : N) : char :=
 
 Instance MonadI_Edge_IO : MonadI Edge IO := {
   read := catch_eof (
-    s <- read_line';;
+    s <- read_line;;
     '(i, j) <- parse_line s;;
     (ret (MkEdge (noc i) (noc j))));
 }.

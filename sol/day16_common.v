@@ -6,7 +6,7 @@ Import ListNotations.
 From ExtLib.Structures Require Import
      Monad MonadFix.
 
-From SimpleIO Require RawChar.
+From SimpleIO Require SimpleIO.
 
 From advent Require Import lib.
 

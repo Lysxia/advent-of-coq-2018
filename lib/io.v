@@ -12,7 +12,7 @@ From ExtLib Require Import
      Data.Monads.OptionMonad
      Structures.Monads.
 
-From SimpleIO Require Import RawChar.
+From SimpleIO Require Import SimpleIO.
 
 From advent.lib Require Import
      string.
@@ -118,7 +118,7 @@ Instance MonadDebug_IO : MonadDebug IO :=
   fun x => x.
 
 Instance MonadI_string_IO : MonadI string IO := {
-  read := catch_eof read_line;
+  read := catch_eof read_line';
 }.
 
 Instance MonadI_list_ascii_IO : MonadI (list ascii) IO := {
@@ -126,7 +126,7 @@ Instance MonadI_list_ascii_IO : MonadI (list ascii) IO := {
 }.
 
 Instance MonadI_ocaml_string_IO : MonadI ocaml_string IO := {
-  read := catch_eof read_line';
+  read := catch_eof read_line;
 }.
 
 Instance MonadI_N_IO : MonadI N IO := {
@@ -162,7 +162,7 @@ Instance MonadO_list_ascii_IO : MonadO (list ascii) IO := {
 }.
 
 Instance MonadO_ocaml_string_IO : MonadO ocaml_string IO := {
-  print := print_endline';
+  print := print_endline;
 }.
 
 End IO.

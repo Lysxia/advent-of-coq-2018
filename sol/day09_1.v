@@ -13,7 +13,7 @@ Import ListNotations.
 From ExtLib Require Import
      Structures.Monad.
 
-From SimpleIO Require Import RawChar.
+From SimpleIO Require Import SimpleIO.
 
 From advent Require Import lib.
 

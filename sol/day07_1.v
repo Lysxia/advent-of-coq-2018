@@ -8,7 +8,7 @@ From Coq Require Import
      Lia.
 Import ListNotations.
 
-From SimpleIO Require SimpleIOUnsafe RawChar.
+From SimpleIO Require SimpleIO.
 
 From ExtLib Require Import
      Structures.Monads.
@@ -105,7 +105,8 @@ Definition main : m unit :=
 
 End main.
 
-Import SimpleIOUnsafe RawChar.
+Import SimpleIO.
+Require Import SimpleIO.IO_Unsafe.
 
 Parameter parse_line : ocaml_string -> IO (char * char).
 Extract Constant parse_line =>
@@ -124,7 +125,7 @@ Definition con (n : N) : char :=
 
 Instance MonadI_Edge_IO : MonadI Edge IO := {
   read := catch_eof (
-    s <- read_line';;
+    s <- read_line;;
     '(i, j) <- parse_line s;;
     (ret (MkEdge (noc i) (noc j))));
 }.

@@ -265,7 +265,7 @@ Instance MonadI_rectangle_IO : MonadI rectangle IO := {
 
 End io.
 
-Import SimpleIO.IOMonad.
+Import SimpleIO.
 
 (* DEBUG *)
 (*

@@ -1,16 +1,17 @@
 From Coq Require Import
-     String List Arith ZArith.
+     String List Arith ZArith
+     extraction.ExtrOcamlIntConv.
 Import ListNotations.
 
 From ExtLib.Structures Require Import
      Monad MonadFix.
 
-From SimpleIO Require RawChar.
+From SimpleIO Require SimpleIO.
 
 From advent Require Import lib sol.day16_common.
 
 Module Import DB.
-Import RawChar.
+Import SimpleIO.
 (* TODO send to simple-io. *)
 Definition debug_switch := false. (* Switch this to [true] for debug
                                      output. *)
@@ -55,7 +56,7 @@ Definition main : m unit := (count_3plausibles >>= print).
 
 End main.
 
-Import RawChar.
+Import SimpleIO.
 
 Parameter parse_sample : forall {regs},
     (int -> int -> int -> int -> regs) ->

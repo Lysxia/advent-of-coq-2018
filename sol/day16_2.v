@@ -1,12 +1,13 @@
 From Coq Require Import
      String List Arith ZArith
-     FMapAVL OrderedTypeEx.
+     FMapAVL OrderedTypeEx
+     extraction.ExtrOcamlIntConv.
 Import ListNotations.
 
 From ExtLib.Structures Require Import
      Monad MonadFix.
 
-From SimpleIO Require RawChar.
+From SimpleIO Require SimpleIO.
 
 From advent Require Import lib sol.day16_common.
 
@@ -29,7 +30,7 @@ Definition show_list {A : Type}
     end%string) xs.
 
 Section show.
-Import RawChar.
+Import SimpleIO.
 
 Definition show_z (z : Z) : string :=
   from_ostring (ostring_of_int (int_of_z z)).
@@ -46,7 +47,7 @@ Definition show_code : list (Z * op) -> string :=
 End show.
 
 Section enum.
-Import RawChar.
+Import SimpleIO.
 
 Inductive stream' (A : Type) :=
 | snil
@@ -121,7 +122,7 @@ Definition test_sample : assignments -> sample -> assignments :=
 Definition deduce_assignments : m assignments :=
   fold_read test_sample initial_assignments.
 
-Import RawChar.
+Import SimpleIO.
 
 Definition check_unique {A : Type}
            (show : A -> string) (s : stream A) : m A :=
@@ -147,7 +148,7 @@ Definition main : m unit :=
 
 End main.
 
-Import RawChar.
+Import SimpleIO.
 
 Parameter parse_sample : forall {regs instr},
     (int -> int -> int -> int -> regs) ->

@@ -79,7 +79,7 @@ Definition main : m unit :=
 
 End main.
 
-Import SimpleIO.IOMonad.
+Import SimpleIO.
 
 Definition exec : io_unit := IO.unsafe_run main.
 

@@ -24,7 +24,7 @@ From ExtLib Require Import
      Structures.Monad
      Structures.MonadFix.
 
-From SimpleIO Require Import RawChar SimpleIOUnsafe.
+From SimpleIO Require Import SimpleIO IO_Unsafe.
 
 From advent Require Import lib.
 

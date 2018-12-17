@@ -10,7 +10,7 @@ From Coq Require Import
      Lia.
 Import ListNotations.
 
-From SimpleIO Require RawChar.
+From SimpleIO Require SimpleIO.
 
 From ExtLib Require Import
      Structures.Monads.
@@ -130,7 +130,7 @@ Definition all_laziest2 (es : list (time * event)) :
 
 Section main.
 
-Import RawChar.
+Import SimpleIO.
 
 Context {m : Type -> Type} `{Monad m} `{MonadFix m}
         `{MonadI (time * event) m}
