@@ -101,7 +101,7 @@ Proof.
   intros Hm Hk.
   rewrite interp_state_bind.
   subst.
-  rewrite Hm.
+  rewrite Hm. cbn.
   rewrite ret_bind.
   simpl.
   rewrite Hk.

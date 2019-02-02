@@ -12,7 +12,7 @@ From ExtLib Require Import
      Data.Monads.OptionMonad
      Structures.Monads.
 
-From SimpleIO Require Import SimpleIO.
+From SimpleIO Require Import SimpleIO IO_UnsafeNat.
 
 From advent.lib Require Import
      string.

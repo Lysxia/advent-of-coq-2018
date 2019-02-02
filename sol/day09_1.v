@@ -7,7 +7,7 @@
  *)
 
 From Coq Require Import
-     List NArith.
+     List NArith String.
 Import ListNotations.
 
 From ExtLib Require Import

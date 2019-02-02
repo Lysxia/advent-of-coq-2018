@@ -82,7 +82,7 @@ Definition main : m unit :=
   for' (GridZ.render (char_of_ascii ".")
                      y_min y_height x_min x_width g)
        (fun line =>
-          print (ostring_of_list line)).
+          print (OString.of_list line)).
 
 End main.
 

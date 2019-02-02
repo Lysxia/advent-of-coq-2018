@@ -132,7 +132,7 @@ Instance MonadI_Edge_IO : MonadI Edge IO := {
 
 Instance MonadO_Ordered_IO : MonadO Ordered IO := {
   print := fun '(MkOrdered os) =>
-    print (ostring_of_list (List.map con os));
+    print (OString.of_list (List.map con os));
 }.
 
 Definition exe : io_unit := IO.unsafe_run main.

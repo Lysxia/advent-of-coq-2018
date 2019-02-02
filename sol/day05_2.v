@@ -1,7 +1,7 @@
 Set Warnings "-extraction-opaque-accessed".
 
 From Coq Require Import
-     Ascii String List Arith
+     Ascii String List Arith NArith
      OrderedTypeEx FMapAVL
      extraction.ExtrOcamlIntConv.
 Import ListNotations.
